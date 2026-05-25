@@ -2,9 +2,10 @@
 import { useCallback, useRef, useState } from 'react';
 import { useChatStore } from '@/store/chatStore';
 import { Message, Mode } from '@/types/chat';
+import toast from 'react-hot-toast';
 
 export function useChat() {
-  const { messages, addMessage, updateLastMessage, setMessages, setIsStreaming, selectedModel, mode, activeChatId, setActiveChatId } = useChatStore();
+  const { messages, addMessage, updateLastMessage, setMessages, setIsStreaming, selectedModel, mode } = useChatStore();
   const [reasoning, setReasoning] = useState('');
   const abortRef = useRef<AbortController | null>(null);
 
@@ -14,26 +15,6 @@ export function useChat() {
     const userMessage: Message = { role: 'user', content, createdAt: new Date() };
     addMessage(userMessage);
     setReasoning('');
-
-    let currentChatId = activeChatId;
-
-    if (!currentChatId) {
-      try {
-        const res = await fetch('/api/chats', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ mode, aiModel: selectedModel, title: content.slice(0, 50) }),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          currentChatId = data.chat._id;
-          setActiveChatId(data.chat._id);
-        }
-      } catch (err) {
-        console.error('Failed to create chat', err);
-        return;
-      }
-    }
 
     const aiMessage: Message = { role: 'assistant', content: '', createdAt: new Date(), model: selectedModel };
     addMessage(aiMessage);
@@ -47,7 +28,6 @@ export function useChat() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          chatId: currentChatId,
           message: content,
           mode,
           model: selectedModel,
@@ -57,7 +37,8 @@ export function useChat() {
       });
 
       if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
+        const errBody = await res.text().catch(() => '');
+        throw new Error(errBody || `HTTP ${res.status}`);
       }
 
       const reader = res.body?.getReader();
@@ -89,7 +70,8 @@ export function useChat() {
             } else if (json.type === 'done') {
               setIsStreaming(false);
             } else if (json.type === 'error') {
-              console.error('Stream error:', json.error);
+              updateLastMessage(`\n\n⚠️ ${json.error}`);
+              toast.error(json.error);
               setIsStreaming(false);
             }
           } catch {}
@@ -97,14 +79,15 @@ export function useChat() {
       }
     } catch (err: any) {
       if (err.name !== 'AbortError') {
-        console.error('Chat error:', err);
+        updateLastMessage(`\n\n⚠️ Connection error: ${err.message}`);
+        toast.error(err.message);
         setIsStreaming(false);
       }
     }
 
     setIsStreaming(false);
     abortRef.current = null;
-  }, [messages, addMessage, updateLastMessage, setIsStreaming, selectedModel, mode, activeChatId, setActiveChatId]);
+  }, [messages, addMessage, updateLastMessage, setIsStreaming, selectedModel, mode]);
 
   const stopGeneration = useCallback(() => {
     if (abortRef.current) {
