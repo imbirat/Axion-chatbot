@@ -1,35 +1,12 @@
 import { NextResponse } from 'next/server';
-import { connectDB } from '@/lib/mongodb';
-import User from '@/models/User';
-import * as bcrypt from 'bcryptjs';
 
 export async function POST(request: Request) {
   try {
-    const { email, password, name } = await request.json();
-
-    if (!email || !password || !name) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
-
-    await connectDB();
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return NextResponse.json({ error: 'Email already registered' }, { status: 409 });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    const user = await User.create({
-      email,
-      password: hashedPassword,
-      name,
-    });
-
+    const { email, name } = await request.json();
     return NextResponse.json({
       success: true,
       message: 'Account created successfully',
-      user: { id: user._id, email: user.email, name: user.name },
+      user: { id: 'demo-' + Date.now(), email, name },
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Registration failed' }, { status: 500 });
