@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Sparkles, Zap, Brain, Cpu, AlertCircle } from 'lucide-react';
+import { ChevronDown, Zap, Brain } from 'lucide-react';
 import { useChatStore } from '@/store/chatStore';
 import { MODELS } from '@/config/models.config';
 import { AxionModel } from '@/types/models';
@@ -10,8 +10,6 @@ import { cn } from '@/lib/utils';
 const categoryIcons: Record<string, React.ReactNode> = {
   basic: <Zap size={14} />,
   main: <Brain size={14} />,
-  thinking: <Sparkles size={14} />,
-  premium: <Cpu size={14} />,
 };
 
 export function ModelSelector() {
@@ -20,8 +18,7 @@ export function ModelSelector() {
   const currentModel = MODELS[selectedModel];
 
   const modeModels = Object.values(MODELS).filter((m) => {
-    if (mode === 'code') return m.id.includes('coder') || m.category === 'thinking';
-    if (mode === 'research') return m.category === 'premium' || m.category === 'thinking' || m.category === 'main';
+    if (mode === 'code') return m.id.includes('coder');
     return !m.id.includes('coder');
   });
 
@@ -38,7 +35,6 @@ export function ModelSelector() {
       >
         {currentModel && categoryIcons[currentModel.category]}
         <span>{currentModel?.name || 'Select Model'}</span>
-        {currentModel?.rateLimited && <AlertCircle size={10} className="text-warning" />}
         <ChevronDown size={12} className={cn('transition-transform', isOpen && 'rotate-180')} />
       </button>
 
@@ -51,13 +47,13 @@ export function ModelSelector() {
             transition={{ duration: 0.15, ease: 'easeOut' }}
             className="absolute bottom-full mb-2 left-0 w-72 glass-surface p-2 z-50"
           >
-            {(['premium', 'thinking', 'main', 'basic'] as const).map((category) => {
+            {(['main', 'basic'] as const).map((category) => {
               const models = modeModels.filter((m) => m.category === category);
               if (models.length === 0) return null;
               return (
                 <div key={category} className="mb-1">
                   <div className="px-3 py-1.5 text-[10px] font-medium text-text-muted uppercase tracking-widest">
-                    {category === 'premium' ? 'Premium' : category === 'thinking' ? 'Thinking' : category === 'main' ? 'Main' : 'Basic'}
+                    {category === 'main' ? 'Main' : 'Basic'}
                   </div>
                   {models.map((model) => (
                     <button
@@ -77,12 +73,6 @@ export function ModelSelector() {
                         <div className="text-sm font-medium truncate">{model.name}</div>
                         <div className="text-[10px] text-text-muted truncate">{model.description}</div>
                       </div>
-                      {model.rateLimited && (
-                        <span className="flex items-center gap-1 text-[10px] text-warning">
-                          <span className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse" />
-                          Limited
-                        </span>
-                      )}
                     </button>
                   ))}
                 </div>

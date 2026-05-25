@@ -8,9 +8,23 @@ import { useChatStore } from '@/store/chatStore';
 import { useChat } from '@/hooks/useChat';
 
 export function MessageList() {
-  const { messages, isStreaming } = useChatStore();
-  const { regenerateLast } = useChat();
+  const { messages, isStreaming, setMessages } = useChatStore();
+  const { sendMessage, regenerateLast } = useChat();
   const { containerRef, scrollToBottom, showScrollButton } = useAutoScroll([messages, isStreaming]);
+
+  const handleEdit = (index: number, newContent: string) => {
+    const currentMessages = useChatStore.getState().messages;
+    const updated = [...currentMessages];
+    updated[index] = { ...updated[index], content: newContent };
+    const nextMsg = updated[index + 1];
+
+    if (nextMsg?.role === 'assistant') {
+      setMessages(updated.slice(0, index + 1));
+      sendMessage(newContent);
+    } else {
+      setMessages(updated);
+    }
+  };
 
   return (
     <div ref={containerRef} className="flex-1 overflow-y-auto px-4 md:px-6 py-6">
@@ -22,6 +36,7 @@ export function MessageList() {
             isStreaming={isStreaming && i === messages.length - 1}
             isLast={i === messages.length - 1}
             onRegenerate={i === messages.length - 1 && msg.role === 'assistant' ? regenerateLast : undefined}
+            onEdit={msg.role === 'user' ? (newContent) => handleEdit(i, newContent) : undefined}
           />
         ))}
 

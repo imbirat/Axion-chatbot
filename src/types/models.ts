@@ -1,6 +1,6 @@
-export type ModelProvider = 'groq' | 'nvidia';
+export type ModelProvider = 'groq';
 
-export type ModelCategory = 'basic' | 'main' | 'thinking' | 'premium';
+export type ModelCategory = 'basic' | 'main';
 
 export type TaskType = 'fast' | 'general' | 'general-premium' | 'coding' | 'reasoning';
 
