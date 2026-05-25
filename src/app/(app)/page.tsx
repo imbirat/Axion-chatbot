@@ -8,19 +8,10 @@ import { WelcomeScreen } from '@/components/chat/WelcomeScreen';
 export default function HomePage() {
   const { messages } = useChatStore();
 
-  const handlePromptSelect = (prompt: string) => {
-    const event = new CustomEvent('axion-prompt', { detail: prompt });
-    window.dispatchEvent(event);
-  };
-
   return (
     <div className="flex flex-col h-full relative">
       <ChatHeader />
-      {messages.length === 0 ? (
-        <WelcomeScreen onSelectPrompt={handlePromptSelect} />
-      ) : (
-        <MessageList />
-      )}
+      {messages.length === 0 ? <WelcomeScreen /> : <MessageList />}
       <ChatInput />
     </div>
   );
