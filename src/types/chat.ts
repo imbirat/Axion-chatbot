@@ -2,13 +2,19 @@ export type MessageRole = 'user' | 'assistant' | 'system';
 
 export type Mode = 'chat' | 'code' | 'research';
 
+export type ContentPart =
+  | { type: 'text'; text: string }
+  | { type: 'image_url'; image_url: { url: string } };
+
 export interface Message {
   _id?: string;
   role: MessageRole;
-  content: string;
+  content: string | ContentPart[];
   reasoning?: string;
   model?: string;
   createdAt?: Date;
+  branchId?: string;
+  parentMessageIndex?: number;
 }
 
 export interface Chat {
@@ -19,6 +25,8 @@ export interface Chat {
   mode: Mode;
   aiModel: string;
   pinned: boolean;
+  branches: Record<string, Message[]>;
+  activeBranchId: string;
   createdAt: Date;
   updatedAt: Date;
 }

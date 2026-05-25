@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useRef } from 'react';
 import { MessageBubble } from './MessageBubble';
+import { SearchSources } from './SearchSources';
 import { ThinkingIndicator } from './ThinkingIndicator';
 import { ScrollToBottom } from './ScrollToBottom';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
@@ -8,8 +8,8 @@ import { useChatStore } from '@/store/chatStore';
 import { useChat } from '@/hooks/useChat';
 
 export function MessageList() {
-  const { messages, isStreaming, setMessages } = useChatStore();
-  const { sendMessage, regenerateLast } = useChat();
+  const { messages, isStreaming, setMessages, activeChatId } = useChatStore();
+  const { sendMessage, regenerateLast, sources } = useChat();
   const { containerRef, scrollToBottom, showScrollButton } = useAutoScroll([messages, isStreaming]);
 
   const handleEdit = (index: number, newContent: string) => {
@@ -29,6 +29,8 @@ export function MessageList() {
   return (
     <div ref={containerRef} className="flex-1 overflow-y-auto px-4 md:px-6 py-6">
       <div className="max-w-3xl mx-auto">
+        {sources.length > 0 && <SearchSources sources={sources} />}
+
         {messages.map((msg, i) => (
           <MessageBubble
             key={msg._id || i}
@@ -37,6 +39,8 @@ export function MessageList() {
             isLast={i === messages.length - 1}
             onRegenerate={i === messages.length - 1 && msg.role === 'assistant' ? regenerateLast : undefined}
             onEdit={msg.role === 'user' ? (newContent) => handleEdit(i, newContent) : undefined}
+            chatId={activeChatId}
+            messageIndex={i}
           />
         ))}
 

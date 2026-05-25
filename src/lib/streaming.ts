@@ -3,9 +3,19 @@ import { MODELS } from '@/config/models.config';
 
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
+function normalizeContent(content: string | any[]): string | any[] {
+  if (typeof content === 'string') return content;
+  return content.map((part) => {
+    if (part.type === 'image_url') {
+      return { type: 'image_url', image_url: { url: part.image_url.url } };
+    }
+    return { type: 'text', text: part.text || '' };
+  });
+}
+
 export async function* generateStream(
   modelId: string,
-  messages: { role: string; content: string }[],
+  messages: { role: string; content: string | any[] }[],
   signal?: AbortSignal,
 ): AsyncGenerator<StreamChunk> {
   const model = MODELS[modelId];
@@ -17,7 +27,8 @@ export async function* generateStream(
   const apiKey = process.env[model.apiKeyEnv];
   if (!apiKey) {
     const lastMsg = messages[messages.length - 1]?.content || '';
-    const mockResponse = `Hello! I'm Axion AI. You said: "${lastMsg.slice(0, 100)}". To enable AI responses, set \`${model.apiKeyEnv}\` in Vercel with a Groq API key. Until then, I'm running in offline demo mode.`;
+    const preview = typeof lastMsg === 'string' ? lastMsg.slice(0, 100) : '(attachments)';
+    const mockResponse = `Hello! I'm Axion AI. You said: "${preview}". To enable AI responses, set \`${model.apiKeyEnv}\` in Vercel with a Groq API key. Until then, I'm running in offline demo mode.`;
     for (const char of mockResponse) {
       yield { type: 'token', content: char };
       await new Promise((r) => setTimeout(r, 15));
@@ -26,7 +37,10 @@ export async function* generateStream(
     return;
   }
 
-  const cleanMessages = messages.map(({ role, content }) => ({ role, content }));
+  const cleanMessages = messages.map(({ role, content }) => ({
+    role,
+    content: normalizeContent(content),
+  }));
 
   const body: any = {
     model: model.underlying,

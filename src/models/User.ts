@@ -6,6 +6,8 @@ export interface IUser extends Document {
   name: string;
   image?: string;
   emailVerified?: Date;
+  customInstructions: string;
+  customInstructionsEnabled: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,6 +19,8 @@ const UserSchema = new Schema<IUser>(
     name: { type: String, required: true },
     image: { type: String },
     emailVerified: { type: Date },
+    customInstructions: { type: String, default: '' },
+    customInstructionsEnabled: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

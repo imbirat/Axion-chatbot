@@ -10,26 +10,88 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { message, mode, model: preferredModel, history } = await request.json();
+    const { message, mode, model: preferredModel, history, attachments, customInstructions, customInstructionsEnabled } = await request.json();
 
-    if (!message) {
-      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
+    if (!message && (!attachments || attachments.length === 0)) {
+      return NextResponse.json({ error: 'Message or attachments required' }, { status: 400 });
     }
 
-    const { model: selectedModel, chain } = await selectModel(message, mode || 'chat', preferredModel);
+    const { model: selectedModel, chain } = await selectModel(message || '', mode || 'chat', preferredModel);
+
+    let systemPrompt = getSystemPrompt(mode || 'chat');
+    if (customInstructionsEnabled && customInstructions?.trim()) {
+      systemPrompt += `\n\nCustom instructions from the user:\n${customInstructions}`;
+    }
+
+    let userContent: string | any[] = message || '';
+    if (attachments && attachments.length > 0) {
+      const parts: any[] = [];
+      if (message) parts.push({ type: 'text', text: message });
+      parts.push(...attachments);
+      userContent = parts;
+    }
 
     const messagesForApi = [
-      { role: 'system', content: getSystemPrompt(mode || 'chat') },
+      { role: 'system', content: systemPrompt },
       ...(history || []).slice(-20).map((m: any) => ({ role: m.role, content: m.content })),
-      { role: 'user', content: message },
+      { role: 'user', content: userContent },
     ];
 
     const encoder = new TextEncoder();
+
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          let modelIndex = 0;
+          // Web search for research mode
+          let searchResults: { title: string; url: string }[] = [];
+          if (mode === 'research') {
+            const tavilyKey = process.env.TAVILY_API_KEY;
+            if (tavilyKey) {
+              try {
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'search-start' })}\n\n`));
 
+                const tavilyRes = await fetch('https://api.tavily.com/search', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    api_key: tavilyKey,
+                    query: message || '',
+                    search_depth: 'basic',
+                    max_results: 6,
+                    include_answer: false,
+                  }),
+                });
+
+                if (tavilyRes.ok) {
+                  const tavilyData = await tavilyRes.json();
+                  searchResults = (tavilyData.results || []).map((r: any, i: number) => ({
+                    title: r.title || `Source ${i + 1}`,
+                    url: r.url || '',
+                  }));
+
+                  for (const result of searchResults) {
+                    controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'search-result', ...result })}\n\n`));
+                  }
+
+                  if (searchResults.length > 0) {
+                    const sourcesBlock = '\n\n## Web Search Results\n\n' +
+                      searchResults.map((s, i) => `${i + 1}. [${s.title}](${s.url})`).join('\n') +
+                      '\n\nUse these sources to inform your answer. Cite them inline where relevant.';
+
+                    messagesForApi[0] = {
+                      role: 'system',
+                      content: systemPrompt + sourcesBlock,
+                    };
+                  }
+                }
+              } catch {
+                // search failed silently
+              }
+            }
+          }
+
+          // Start model chain
+          let modelIndex = 0;
           while (modelIndex < chain.length) {
             const currentModelId = chain[modelIndex];
             try {
@@ -94,7 +156,7 @@ function getSystemPrompt(mode: string): string {
     case 'code':
       return 'You are an expert software engineer. Write clean, well-structured code. Provide explanations and best practices.';
     case 'research':
-      return 'You are a deep research assistant. Provide thorough, structured analysis with clear reasoning. Cite sources where possible.';
+      return 'You are AXION DeepResearch, an advanced research assistant. Provide thorough, structured analysis with clear reasoning. Structure your response with: 1. Executive Summary 2. Key Findings 3. Detailed Analysis 4. Conclusions. Use clear headings, bullet points, and evidence-based reasoning. Cite sources where possible.';
     default:
       return 'You are Axion AI, a helpful, intelligent assistant. Provide clear, accurate, and thoughtful responses.';
   }

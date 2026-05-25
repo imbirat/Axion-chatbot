@@ -14,32 +14,57 @@ interface MessageBubbleProps {
   isLast?: boolean;
   onRegenerate?: () => void;
   onEdit?: (newContent: string) => void;
+  chatId?: string | null;
+  messageIndex?: number;
+  initialReaction?: 'up' | 'down' | null;
 }
 
-export function MessageBubble({ message, isStreaming, isLast, onRegenerate, onEdit }: MessageBubbleProps) {
+export function MessageBubble({ message, isStreaming, isLast, onRegenerate, onEdit, chatId, messageIndex, initialReaction }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editText, setEditText] = useState(message.content);
+  const [editText, setEditText] = useState(typeof message.content === 'string' ? message.content : '');
+  const [reaction, setReaction] = useState<'up' | 'down' | null>(initialReaction || null);
+  const [reactionLoading, setReactionLoading] = useState(false);
   const isUser = message.role === 'user';
   const isAssistant = message.role === 'assistant';
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(message.content);
+    const text = typeof message.content === 'string' ? message.content : '';
+    await navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   };
 
   const handleSaveEdit = () => {
-    if (editText.trim() && editText !== message.content) {
+    if (editText.trim() && editText !== (typeof message.content === 'string' ? message.content : '')) {
       onEdit?.(editText);
     }
     setIsEditing(false);
   };
 
   const handleCancelEdit = () => {
-    setEditText(message.content);
+    setEditText(typeof message.content === 'string' ? message.content : '');
     setIsEditing(false);
   };
+
+  const handleReaction = async (type: 'up' | 'down') => {
+    if (reactionLoading || !chatId || messageIndex === undefined) return;
+    const newReaction = reaction === type ? null : type;
+    setReaction(newReaction);
+    setReactionLoading(true);
+    try {
+      await fetch(`/api/chats/${chatId}/react`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messageIndex, reaction: newReaction }),
+      });
+    } catch {
+      setReaction(reaction);
+    }
+    setReactionLoading(false);
+  };
+
+  const displayContent = typeof message.content === 'string' ? message.content : '';
 
   return (
     <motion.div
@@ -80,16 +105,16 @@ export function MessageBubble({ message, isStreaming, isLast, onRegenerate, onEd
               </div>
             </div>
           ) : isUser ? (
-            <p className="text-sm text-text-primary leading-relaxed whitespace-pre-wrap">{message.content}</p>
+            <p className="text-sm text-text-primary leading-relaxed whitespace-pre-wrap">{displayContent}</p>
           ) : (
             <div className="prose prose-invert max-w-none text-sm">
-              <MarkdownRenderer content={message.content} />
+              <MarkdownRenderer content={displayContent} />
               {isStreaming && isLast && <StreamCursor />}
             </div>
           )}
         </div>
 
-        {!isStreaming && message.content && isUser && (
+        {!isStreaming && displayContent && isUser && (
           <div className="flex items-center gap-1 mt-1.5 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
             <button onClick={handleCopy} className="p-1 rounded hover:bg-[var(--hover-bg)] text-text-muted hover:text-text-primary transition-colors" title="Copy">
               {copied ? <Check size={12} className="text-success" /> : <Copy size={12} />}
@@ -102,12 +127,26 @@ export function MessageBubble({ message, isStreaming, isLast, onRegenerate, onEd
           </div>
         )}
 
-        {isAssistant && !isStreaming && message.content && (
+        {isAssistant && !isStreaming && displayContent && (
           <div className="flex items-center gap-1 mt-1.5 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-            <button className="p-1 rounded hover:bg-[var(--hover-bg)] text-text-muted hover:text-green-600 transition-colors" title="Good response">
+            <button
+              onClick={() => handleReaction('up')}
+              className={cn(
+                'p-1 rounded hover:bg-[var(--hover-bg)] transition-colors',
+                reaction === 'up' ? 'text-green-600' : 'text-text-muted hover:text-green-600'
+              )}
+              title="Good response"
+            >
               <ThumbsUp size={12} />
             </button>
-            <button className="p-1 rounded hover:bg-[var(--hover-bg)] text-text-muted hover:text-red-500 transition-colors" title="Bad response">
+            <button
+              onClick={() => handleReaction('down')}
+              className={cn(
+                'p-1 rounded hover:bg-[var(--hover-bg)] transition-colors',
+                reaction === 'down' ? 'text-red-500' : 'text-text-muted hover:text-red-500'
+              )}
+              title="Bad response"
+            >
               <ThumbsDown size={12} />
             </button>
             <button onClick={handleCopy} className="p-1 rounded hover:bg-[var(--hover-bg)] text-text-muted hover:text-text-primary transition-colors" title="Copy">

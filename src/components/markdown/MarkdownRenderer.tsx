@@ -1,24 +1,50 @@
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 import { CodeBlock } from './CodeBlock';
+import { useArtifact } from '@/context/ArtifactContext';
 
 interface MarkdownRendererProps {
   content: string;
 }
 
+const ARTIFACT_LANGUAGES = ['html', 'jsx', 'svg', 'mermaid'];
+
 export function MarkdownRenderer({ content }: MarkdownRendererProps) {
+  const { setActiveArtifact } = useArtifact();
+
   return (
     <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
+      remarkPlugins={[remarkGfm, remarkMath]}
+      rehypePlugins={[rehypeKatex]}
       components={{
         code({ className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || '');
           const value = String(children).replace(/\n$/, '');
-          
+
           if (match) {
-            return <CodeBlock language={match[1]} value={value} />;
+            const lang = match[1];
+            const lines = value.split('\n').length;
+
+            if (lines > 10 && ARTIFACT_LANGUAGES.includes(lang)) {
+              const title = value.split('\n')[0]?.replace(/^\/\/\s*|^#\s*|^<!--\s*|-->$/g, '').trim() || lang;
+              return (
+                <div className="relative group">
+                  <CodeBlock language={lang} value={value} />
+                  <button
+                    onClick={() => setActiveArtifact({ language: lang, code: value, title })}
+                    className="absolute top-2 right-2 px-2.5 py-1 rounded-md text-[11px] font-medium bg-accent-primary/80 text-white opacity-0 group-hover:opacity-100 hover:bg-accent-primary transition-opacity"
+                  >
+                    Open artifact →
+                  </button>
+                </div>
+              );
+            }
+
+            return <CodeBlock language={lang} value={value} />;
           }
-          
+
           return (
             <code
               className="px-1.5 py-0.5 rounded-md bg-bg-elevated text-accent-primary text-xs font-mono"

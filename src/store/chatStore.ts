@@ -10,7 +10,9 @@ interface ChatState {
   selectedModel: string;
   isStreaming: boolean;
   searchQuery: string;
-  
+  branches: Record<string, Message[]>;
+  activeBranchId: string;
+
   setChats: (chats: Chat[]) => void;
   setActiveChatId: (id: string | null) => void;
   setMessages: (messages: Message[]) => void;
@@ -24,9 +26,15 @@ interface ChatState {
   removeChat: (id: string) => void;
   updateChat: (id: string, updates: Partial<Chat>) => void;
   reset: () => void;
+  createBranch: (fromIndex: number, newContent: string) => string;
+  switchBranch: (branchId: string) => void;
 }
 
-export const useChatStore = create<ChatState>((set) => ({
+function generateId(): string {
+  return 'branch_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+}
+
+export const useChatStore = create<ChatState>((set, get) => ({
   chats: [],
   activeChatId: null,
   messages: [],
@@ -34,6 +42,8 @@ export const useChatStore = create<ChatState>((set) => ({
   selectedModel: 'axion-4.6',
   isStreaming: false,
   searchQuery: '',
+  branches: { main: [] },
+  activeBranchId: 'main',
 
   setChats: (chats) => set({ chats }),
   setActiveChatId: (id) => set({ activeChatId: id }),
@@ -58,5 +68,23 @@ export const useChatStore = create<ChatState>((set) => ({
     set((state) => ({
       chats: state.chats.map((c) => (c._id === id ? { ...c, ...updates } : c)),
     })),
-  reset: () => set({ messages: [], activeChatId: null, isStreaming: false }),
+  reset: () => set({ messages: [], activeChatId: null, isStreaming: false, branches: { main: [] }, activeBranchId: 'main' }),
+
+  createBranch: (fromIndex, newContent) => {
+    const state = get();
+    const branchId = generateId();
+    const forked = state.messages.slice(0, fromIndex + 1);
+    forked[fromIndex] = { ...forked[fromIndex], content: newContent, branchId, parentMessageIndex: fromIndex };
+    const branches = { ...state.branches, [branchId]: forked };
+    set({ branches, activeBranchId: branchId, messages: forked });
+    return branchId;
+  },
+
+  switchBranch: (branchId) => {
+    const state = get();
+    const branchMessages = state.branches[branchId];
+    if (branchMessages) {
+      set({ activeBranchId: branchId, messages: [...branchMessages] });
+    }
+  },
 }));

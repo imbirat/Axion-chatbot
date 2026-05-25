@@ -6,13 +6,17 @@ interface SettingsState {
   sidebarCollapsed: boolean;
   fontSize: 'sm' | 'base' | 'lg';
   enterToSend: boolean;
-  
+  customInstructions: string;
+  customInstructionsEnabled: boolean;
+
   setTheme: (theme: 'dark' | 'light') => void;
   toggleTheme: () => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
   toggleSidebar: () => void;
   setFontSize: (size: 'sm' | 'base' | 'lg') => void;
   setEnterToSend: (value: boolean) => void;
+  setCustomInstructions: (value: string) => void;
+  setCustomInstructionsEnabled: (value: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsState>()(
@@ -22,6 +26,8 @@ export const useSettingsStore = create<SettingsState>()(
       sidebarCollapsed: false,
       fontSize: 'base',
       enterToSend: true,
+      customInstructions: '',
+      customInstructionsEnabled: true,
 
       setTheme: (theme) => set({ theme }),
       toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
@@ -29,6 +35,8 @@ export const useSettingsStore = create<SettingsState>()(
       toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
       setFontSize: (fontSize) => set({ fontSize }),
       setEnterToSend: (enterToSend) => set({ enterToSend }),
+      setCustomInstructions: (customInstructions) => set({ customInstructions }),
+      setCustomInstructionsEnabled: (customInstructionsEnabled) => set({ customInstructionsEnabled }),
     }),
     { name: 'axion-settings' }
   )

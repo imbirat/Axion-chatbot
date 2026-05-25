@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { Providers } from '@/components/providers/Providers';
+import 'katex/dist/katex.min.css';
 import '@/styles/globals.css';
 
 const geistSans = Geist({

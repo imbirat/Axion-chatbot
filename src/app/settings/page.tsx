@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useChatStore } from '@/store/chatStore';
@@ -9,9 +10,42 @@ import toast from 'react-hot-toast';
 
 export default function SettingsPage() {
   const { data: session } = useSession();
-  const { theme, toggleTheme, fontSize, setFontSize, enterToSend, setEnterToSend } = useSettingsStore();
+  const {
+    theme, toggleTheme, fontSize, setFontSize, enterToSend, setEnterToSend,
+    customInstructions, setCustomInstructions,
+    customInstructionsEnabled, setCustomInstructionsEnabled,
+  } = useSettingsStore();
   const { chats, setChats, setMessages, setActiveChatId } = useChatStore();
   const router = useRouter();
+
+  const [localInstructions, setLocalInstructions] = useState(customInstructions);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!loaded) {
+      fetch('/api/user/instructions')
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.customInstructions !== undefined) {
+            setCustomInstructions(data.customInstructions);
+            setLocalInstructions(data.customInstructions);
+          }
+          if (data.customInstructionsEnabled !== undefined) {
+            setCustomInstructionsEnabled(data.customInstructionsEnabled);
+          }
+        })
+        .catch(() => {})
+        .finally(() => setLoaded(true));
+    }
+  }, [loaded, setCustomInstructions, setCustomInstructionsEnabled]);
+
+  useEffect(() => {
+    if (loaded) {
+      setLocalInstructions(customInstructions);
+    }
+  }, [customInstructions, loaded]);
 
   const handleClearChats = async () => {
     try {
@@ -25,6 +59,33 @@ export default function SettingsPage() {
     } catch {
       toast.error('Failed to clear chats');
     }
+  };
+
+  const handleSaveInstructions = async () => {
+    setSaving(true);
+    setSaved(false);
+    try {
+      const res = await fetch('/api/user/instructions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customInstructions: localInstructions,
+          customInstructionsEnabled,
+        }),
+      });
+      if (res.ok) {
+        setCustomInstructions(localInstructions);
+        setSaved(true);
+        toast.success('Custom instructions saved');
+        setTimeout(() => setSaved(false), 2000);
+      } else {
+        const err = await res.json();
+        toast.error(err.error || 'Failed to save');
+      }
+    } catch {
+      toast.error('Failed to save instructions');
+    }
+    setSaving(false);
   };
 
   return (
@@ -94,6 +155,58 @@ export default function SettingsPage() {
                   <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${enterToSend ? 'translate-x-5' : 'translate-x-0.5'}`} />
                 </button>
               </div>
+            </div>
+          </section>
+
+          {/* Custom Instructions */}
+          <section className="glass-surface p-6">
+            <h2 className="text-sm font-medium text-text-primary mb-4">Custom Instructions</h2>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-text-secondary">Enable custom instructions</span>
+                <button
+                  onClick={() => {
+                    setCustomInstructionsEnabled(!customInstructionsEnabled);
+                    if (loaded) {
+                      fetch('/api/user/instructions', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ customInstructionsEnabled: !customInstructionsEnabled }),
+                      }).catch(() => {});
+                    }
+                  }}
+                  className={`relative w-10 h-5 rounded-full transition-colors ${customInstructionsEnabled ? 'bg-accent-primary' : 'bg-bg-elevated'}`}
+                >
+                  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${customInstructionsEnabled ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                </button>
+              </div>
+              {customInstructionsEnabled && (
+                <>
+                  <div className="relative">
+                    <textarea
+                      value={localInstructions}
+                      onChange={(e) => {
+                        if (e.target.value.length <= 1500) setLocalInstructions(e.target.value);
+                      }}
+                      placeholder="e.g. Always respond in Spanish. Prefer bullet points. You are an expert in molecular biology..."
+                      rows={4}
+                      className="w-full bg-bg-elevated border border-border-subtle rounded-lg p-3 text-sm text-text-primary placeholder:text-text-muted/50 resize-none focus:outline-none focus:ring-1 focus:ring-accent-primary/40"
+                    />
+                    <span className="absolute bottom-2 right-3 text-[10px] text-text-muted">
+                      {localInstructions.length}/1500
+                    </span>
+                  </div>
+                  <div className="flex justify-end">
+                    <button
+                      onClick={handleSaveInstructions}
+                      disabled={saving}
+                      className="px-4 py-1.5 rounded-lg text-sm font-medium bg-accent-primary text-white hover:bg-accent-primary/90 transition-colors disabled:opacity-50"
+                    >
+                      {saved ? 'Saved ✓' : saving ? 'Saving...' : 'Save'}
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </section>
 

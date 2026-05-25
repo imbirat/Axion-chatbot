@@ -1,20 +1,38 @@
 'use client';
 import { useCallback, useRef, useState } from 'react';
 import { useChatStore } from '@/store/chatStore';
-import { Message, Mode } from '@/types/chat';
+import { useSettingsStore } from '@/store/settingsStore';
+import { Message, ContentPart } from '@/types/chat';
+import { SearchSource } from '@/types/api';
 import toast from 'react-hot-toast';
 
 export function useChat() {
   const { messages, addMessage, updateLastMessage, setMessages, setIsStreaming, selectedModel, mode } = useChatStore();
+  const { customInstructions, customInstructionsEnabled } = useSettingsStore();
   const [reasoning, setReasoning] = useState('');
+  const [sources, setSources] = useState<SearchSource[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
 
-  const sendMessage = useCallback(async (content: string) => {
-    if (!content.trim()) return;
+  const sendMessage = useCallback(async (content: string, attachments?: ContentPart[]) => {
+    const textContent = typeof content === 'string' ? content.trim() : '';
+    if (!textContent && (!attachments || attachments.length === 0)) return;
 
-    const userMessage: Message = { role: 'user', content, createdAt: new Date() };
+    let userContent: string | ContentPart[];
+    if (attachments && attachments.length > 0) {
+      const parts: ContentPart[] = [];
+      if (textContent) parts.push({ type: 'text', text: textContent });
+      parts.push(...attachments);
+      userContent = parts;
+    } else {
+      userContent = textContent;
+    }
+
+    const userMessage: Message = { role: 'user', content: userContent, createdAt: new Date() };
     addMessage(userMessage);
     setReasoning('');
+    setSources([]);
+    setIsSearching(false);
 
     const aiMessage: Message = { role: 'assistant', content: '', createdAt: new Date(), model: selectedModel };
     addMessage(aiMessage);
@@ -28,10 +46,13 @@ export function useChat() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: content,
+          message: textContent,
           mode,
           model: selectedModel,
           history: messages.slice(-10),
+          attachments,
+          customInstructions,
+          customInstructionsEnabled,
         }),
         signal: abortController.signal,
       });
@@ -67,6 +88,12 @@ export function useChat() {
               setReasoning((prev) => prev + json.content);
             } else if (json.type === 'model-switch') {
               useChatStore.setState({ selectedModel: json.model });
+            } else if (json.type === 'search-start') {
+              setSources([]);
+              setIsSearching(true);
+            } else if (json.type === 'search-result') {
+              setSources((prev) => [...prev, { title: json.title || '', url: json.url || '' }]);
+              setIsSearching(false);
             } else if (json.type === 'done') {
               setIsStreaming(false);
             } else if (json.type === 'error') {
@@ -87,7 +114,7 @@ export function useChat() {
 
     setIsStreaming(false);
     abortRef.current = null;
-  }, [messages, addMessage, updateLastMessage, setIsStreaming, selectedModel, mode]);
+  }, [messages, addMessage, updateLastMessage, setIsStreaming, selectedModel, mode, customInstructions, customInstructionsEnabled]);
 
   const stopGeneration = useCallback(() => {
     if (abortRef.current) {
@@ -101,9 +128,10 @@ export function useChat() {
     const lastUserMsg = [...messages].reverse().find(m => m.role === 'user');
     if (lastUserMsg) {
       setMessages(messages.slice(0, -1));
-      await sendMessage(lastUserMsg.content);
+      const content = typeof lastUserMsg.content === 'string' ? lastUserMsg.content : '';
+      await sendMessage(content, undefined);
     }
   }, [messages, sendMessage, setMessages]);
 
-  return { messages, sendMessage, stopGeneration, regenerateLast, reasoning, isStreaming: useChatStore((s) => s.isStreaming) };
+  return { messages, sendMessage, stopGeneration, regenerateLast, reasoning, sources, isSearching, isStreaming: useChatStore((s) => s.isStreaming) };
 }

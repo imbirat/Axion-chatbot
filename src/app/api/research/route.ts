@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { connectDB } from '@/lib/mongodb';
-import Chat from '@/models/Chat';
 import { selectModel } from '@/lib/router';
 import { generateStream } from '@/lib/streaming';
 
@@ -20,7 +18,54 @@ export async function POST(request: Request) {
 
     const { model: selectedModel, chain } = await selectModel(query, 'research');
 
-    const systemPrompt = `You are AXION DeepResearch, an advanced research assistant. 
+    let sourcesHtml = '';
+    let searchResults: { title: string; url: string }[] = [];
+
+    const tavilyKey = process.env.TAVILY_API_KEY;
+    if (tavilyKey) {
+      try {
+        const tavilyRes = await fetch('https://api.tavily.com/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            api_key: tavilyKey,
+            query,
+            search_depth: depth === 'comprehensive' ? 'advanced' : 'basic',
+            max_results: 8,
+            include_answer: false,
+          }),
+        });
+
+        if (tavilyRes.ok) {
+          const tavilyData = await tavilyRes.json();
+          searchResults = (tavilyData.results || []).map((r: any, i: number) => ({
+            title: r.title || `Source ${i + 1}`,
+            url: r.url || '',
+          }));
+
+          if (searchResults.length > 0) {
+            sourcesHtml = '\n\n## Web Search Results\n\n' +
+              searchResults.map((s, i) => `${i + 1}. [${s.title}](${s.url})`).join('\n') +
+              '\n\nUse these sources to inform your answer. Cite them inline where relevant.';
+          }
+        }
+      } catch {
+        // Tavily search failed silently, continue without sources
+      }
+    }
+
+    const encoder = new TextEncoder();
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          // Emit search events
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'search-start' })}\n\n`));
+          for (const result of searchResults) {
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'search-result', ...result })}\n\n`));
+          }
+
+          const systemPrompt = `You are AXION DeepResearch, an advanced research assistant. 
 Depth: ${depth === 'comprehensive' ? 'Extremely thorough, academic-level analysis' : depth === 'deep' ? 'Detailed multi-perspective analysis' : 'Balanced overview with key insights'}
 
 Structure your response with:
@@ -29,17 +74,13 @@ Structure your response with:
 3. Detailed Analysis
 4. Conclusions
 
-Use clear headings, bullet points, and evidence-based reasoning.`;
+Use clear headings, bullet points, and evidence-based reasoning.${sourcesHtml}`;
 
-    const messagesForApi = [
-      { role: 'system', content: systemPrompt },
-      { role: 'user', content: query },
-    ];
+          const messagesForApi = [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: query },
+          ];
 
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
           let modelIndex = 0;
           while (modelIndex < chain.length) {
             const currentModelId = chain[modelIndex];
