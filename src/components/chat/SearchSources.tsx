@@ -40,7 +40,7 @@ export function SearchSources({ sources }: SearchSourcesProps) {
       className="mb-3 px-2"
     >
       <div className="flex items-center gap-2 mb-2">
-        <Globe size={12} className="text-accent-primary" />
+        <Globe size={12} className="text-text-muted" />
         <span className="text-[11px] font-medium text-text-muted uppercase tracking-wider">Sources</span>
         <span className="text-[10px] text-text-muted">({sources.length})</span>
       </div>
@@ -51,7 +51,13 @@ export function SearchSources({ sources }: SearchSourcesProps) {
             href={source.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-bg-elevated border border-border-subtle text-[11px] text-text-secondary hover:text-text-primary hover:border-accent-primary/30 transition-colors group"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-text-secondary hover:text-text-primary transition-colors group"
+            style={{
+              background: 'var(--color-bg-elevated)',
+              border: '1px solid var(--color-border-subtle)',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(207,116,85,0.35)')}
+            onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--color-border-subtle)')}
           >
             {getFaviconUrl(source.url) && (
               <img

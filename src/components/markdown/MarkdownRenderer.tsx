@@ -46,7 +46,14 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
           }
 
           return (
-            <code className="px-1.5 py-0.5 rounded-md bg-accent-primary/8 text-accent-primary text-xs font-mono">
+            <code
+              className="px-1.5 py-0.5 rounded-md text-[12.5px] font-mono"
+              style={{
+                background: 'var(--color-bg-elevated)',
+                color: 'var(--color-accent-primary)',
+                border: '1px solid var(--color-border-subtle)',
+              }}
+            >
               {children}
             </code>
           );
@@ -64,17 +71,20 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
           <h3 className="text-base font-semibold text-text-primary mt-5 mb-2 leading-tight">{children}</h3>
         ),
         p: ({ children }) => (
-          <p className="text-sm leading-relaxed mb-4 last:mb-0 text-text-secondary">{children}</p>
+          <p className="text-[15px] leading-[1.8] mb-4 last:mb-0 text-text-secondary">{children}</p>
         ),
         ul: ({ children }) => (
-          <ul className="list-disc list-outside text-sm text-text-secondary space-y-1 mb-4 pl-5">{children}</ul>
+          <ul className="list-disc list-outside text-[14.5px] text-text-secondary space-y-1.5 mb-4 pl-5">{children}</ul>
         ),
         ol: ({ children }) => (
-          <ol className="list-decimal list-outside text-sm text-text-secondary space-y-1 mb-4 pl-5">{children}</ol>
+          <ol className="list-decimal list-outside text-[14.5px] text-text-secondary space-y-1.5 mb-4 pl-5">{children}</ol>
         ),
-        li: ({ children }) => <li className="text-sm leading-relaxed">{children}</li>,
+        li: ({ children }) => <li className="text-[14.5px] leading-[1.75]">{children}</li>,
         blockquote: ({ children }) => (
-          <blockquote className="border-l-2 border-accent-primary/30 pl-4 py-1 my-4 text-sm text-text-secondary/80 italic">
+          <blockquote
+            className="pl-4 py-0.5 my-4 text-[14px] text-text-secondary italic"
+            style={{ borderLeft: '3px solid var(--color-accent-primary)', opacity: 0.85 }}
+          >
             {children}
           </blockquote>
         ),
@@ -91,7 +101,12 @@ export function MarkdownRenderer({ content }: MarkdownRendererProps) {
           </div>
         ),
         th: ({ children }) => (
-          <th className="border-b border-border-subtle px-4 py-2.5 bg-bg-elevated/50 text-left text-text-primary text-xs font-semibold uppercase tracking-wider">{children}</th>
+          <th
+            className="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-text-secondary"
+            style={{ background: 'var(--color-bg-elevated)', borderBottom: '1px solid var(--color-border-subtle)' }}
+          >
+            {children}
+          </th>
         ),
         td: ({ children }) => (
           <td className="border-b border-border-subtle px-4 py-2.5 text-text-secondary">{children}</td>

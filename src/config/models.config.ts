@@ -32,7 +32,7 @@ export const MODELS: Record<string, AxionModel> = {
     name: 'Axion 4.7',
     provider: 'groq',
     apiKeyEnv: 'GROQ_API_KEY',
-    underlying: 'deepseek-r1-distill-qwen-32b',
+    underlying: 'llama-3.3-70b-versatile',
     category: 'main',
     description: 'Primary reasoning + intelligence',
     supportsStreaming: true,

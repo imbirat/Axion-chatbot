@@ -43,11 +43,22 @@ export function ArtifactPanel() {
           animate={{ x: 0 }}
           exit={{ x: 420 }}
           transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed right-0 top-0 h-full w-[420px] bg-bg-surface border-l border-border-subtle z-50 flex flex-col shadow-2xl"
+          className="fixed right-0 top-0 h-full w-[420px] z-50 flex flex-col"
+          style={{
+            background: 'var(--color-bg-base)',
+            borderLeft: '1px solid var(--color-border-subtle)',
+            boxShadow: '-4px 0 24px rgba(0,0,0,0.06)',
+          }}
         >
           <div className="flex items-center justify-between px-4 py-3 border-b border-border-subtle">
             <span className="inline-flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded text-[11px] font-medium bg-accent-primary/10 text-accent-primary uppercase tracking-wider">
+              <span
+                className="px-2 py-0.5 rounded-lg text-[10px] font-semibold uppercase tracking-wider"
+                style={{
+                  background: 'rgba(207,116,85,0.12)',
+                  color: 'var(--color-accent-primary)',
+                }}
+              >
                 {activeArtifact.language}
               </span>
               <span className="text-sm font-medium text-text-primary truncate max-w-[240px]">

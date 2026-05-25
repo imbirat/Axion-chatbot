@@ -45,7 +45,12 @@ export function ModelSelector() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 4 }}
             transition={{ duration: 0.15, ease: 'easeOut' }}
-            className="absolute bottom-full mb-2 left-0 w-64 glass-surface p-1.5 z-50"
+            className="absolute bottom-full mb-2 left-0 w-64 p-1.5 z-50 rounded-2xl shadow-lg"
+            style={{
+              background: 'var(--color-bg-elevated)',
+              border: '1px solid var(--color-border-subtle)',
+              boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+            }}
           >
             {(['main', 'basic'] as const).map((category) => {
               const models = modeModels.filter((m) => m.category === category);
@@ -55,18 +60,20 @@ export function ModelSelector() {
                   <div className="px-3 py-1.5 text-[9px] font-medium text-text-muted uppercase tracking-widest">
                     {category === 'main' ? 'Main' : 'Basic'}
                   </div>
-                  {models.map((model) => (
+                    {models.map((model) => (
                     <button
                       key={model.id}
                       onClick={() => handleSelect(model)}
                       className={cn(
                         'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all duration-150',
                         selectedModel === model.id
-                          ? 'bg-accent-primary/10 text-accent-primary'
+                          ? 'text-accent-primary'
                           : 'text-text-secondary hover:bg-[var(--hover-bg)] hover:text-text-primary'
                       )}
+                      style={selectedModel === model.id ? { background: 'rgba(207,116,85,0.10)' } : {}}
                     >
-                      <span className={cn('w-7 h-7 rounded-lg flex items-center justify-center', selectedModel === model.id ? 'bg-accent-primary/15' : 'bg-bg-elevated')}>
+                      <span className={cn('w-7 h-7 rounded-lg flex items-center justify-center', selectedModel === model.id ? '' : 'bg-bg-elevated')}
+                        style={selectedModel === model.id ? { background: 'rgba(207,116,85,0.15)' } : {}}>
                         {categoryIcons[model.category]}
                       </span>
                       <div className="flex-1 min-w-0">

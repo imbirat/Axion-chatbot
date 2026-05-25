@@ -52,12 +52,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg-base relative overflow-hidden">
-      {/* Animated mesh background */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute inset-0 bg-gradient-to-br from-accent-primary/20 via-transparent to-accent-secondary/20 animate-[mesh-gradient_20s_ease_infinite]" style={{ backgroundSize: '200% 200%' }} />
-        <div className="absolute top-20 left-20 w-72 h-72 bg-accent-primary/10 rounded-full blur-3xl animate-float" />
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-accent-secondary/10 rounded-full blur-3xl animate-float" style={{ animationDelay: '-5s' }} />
-      </div>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -65,10 +59,23 @@ export default function LoginPage() {
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className="relative z-10 w-full max-w-[400px] mx-4"
       >
-        <div className="glass-surface p-8">
+        <div
+          className="p-8 rounded-2xl"
+          style={{
+            background: 'var(--color-bg-base)',
+            border: '1px solid var(--color-border-subtle)',
+            boxShadow: '0 4px 32px rgba(0,0,0,0.06)',
+          }}
+        >
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center text-2xl font-bold text-white mx-auto mb-4 shadow-lg shadow-accent-primary/20">
-              A
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              style={{ background: 'linear-gradient(135deg, #CF7455 0%, #E8956A 100%)' }}
+            >
+              <svg width="24" height="24" viewBox="0 0 18 18" fill="none">
+                <path d="M4 14 L9 4 L14 14" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M6 10.5 H12" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
+              </svg>
             </div>
             <h1 className="text-2xl font-semibold text-text-primary tracking-tight mb-1">
               {isRegister ? 'Create account' : 'Welcome back'}
