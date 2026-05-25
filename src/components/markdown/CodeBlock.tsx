@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Check, Copy } from 'lucide-react';
+import { Check, Copy, Terminal } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
@@ -11,13 +11,14 @@ const customStyle = {
     background: '#0d1220',
     borderRadius: '0 0 12px 12px',
     margin: 0,
-    padding: '16px',
+    padding: '20px',
     fontSize: '13px',
   },
   'code[class*="language-"]': {
     ...oneDark['code[class*="language-"]'],
     fontFamily: "'Geist Mono', 'JetBrains Mono', monospace",
     fontSize: '13px',
+    lineHeight: 1.6,
   },
 };
 
@@ -36,14 +37,17 @@ export function CodeBlock({ language, value }: CodeBlockProps) {
   };
 
   return (
-    <div className="group relative my-4 rounded-xl overflow-hidden border border-border-subtle">
-      <div className="flex items-center justify-between px-4 py-2 bg-bg-elevated border-b border-border-subtle">
-        <span className="text-[10px] font-mono text-text-muted uppercase tracking-wider">
-          {language || 'code'}
-        </span>
+    <div className="group relative my-4 rounded-xl overflow-hidden border border-border-subtle shadow-sm">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-[#0b0e14] border-b border-white/[0.04]">
+        <div className="flex items-center gap-2">
+          <Terminal size={12} className="text-text-muted/60" />
+          <span className="text-[11px] font-mono text-text-muted/70 uppercase tracking-wider">
+            {language || 'code'}
+          </span>
+        </div>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1 px-2 py-1 rounded text-[10px] text-text-muted hover:text-text-primary hover:bg-[var(--hover-bg)] transition-all opacity-0 group-hover:opacity-100"
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-text-muted/60 hover:text-text-primary hover:bg-white/[0.06] transition-all opacity-0 group-hover:opacity-100"
         >
           {copied ? (
             <><Check size={12} className="text-success" /> Copied</>

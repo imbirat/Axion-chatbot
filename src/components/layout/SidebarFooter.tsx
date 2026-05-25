@@ -1,9 +1,8 @@
 'use client';
-import { Settings, HelpCircle, LogOut, User, Sun, Moon } from 'lucide-react';
+import { Settings, LogOut, User, Sun, Moon } from 'lucide-react';
 import { useSettingsStore } from '@/store/settingsStore';
 import { signOut, useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,14 +17,18 @@ export function SidebarFooter() {
   const router = useRouter();
 
   return (
-    <div className="mt-auto pt-3 border-t border-border-subtle space-y-1">
+    <div className="mt-auto pt-3 px-3 pb-3 border-t border-border-subtle">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--hover-bg)] transition-colors text-sm text-text-secondary hover:text-text-primary">
-            <div className="w-7 h-7 rounded-full bg-accent-primary/20 flex items-center justify-center text-xs font-medium text-accent-primary">
-              {session?.user?.name?.charAt(0) || 'U'}
+          <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--hover-bg)] transition-all duration-200 text-sm">
+            <div className="w-8 h-8 rounded-full bg-accent-primary/15 flex items-center justify-center text-xs font-semibold text-accent-primary shrink-0">
+              {session?.user?.name?.charAt(0)?.toUpperCase() || 'U'}
             </div>
-            <span className="truncate">{session?.user?.name || 'User'}</span>
+            <div className="flex-1 text-left min-w-0">
+              <p className="text-sm font-medium text-text-primary truncate">{session?.user?.name || 'User'}</p>
+              <p className="text-[10px] text-text-muted truncate">{session?.user?.email || ''}</p>
+            </div>
+            <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse shrink-0" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" side="right" sideOffset={8} className="w-56">
@@ -41,20 +44,12 @@ export function SidebarFooter() {
             {theme === 'dark' ? <Sun size={14} className="mr-2" /> : <Moon size={14} className="mr-2" />}
             {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <HelpCircle size={14} className="mr-2" /> Help
-          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/login' })}>
             <LogOut size={14} className="mr-2" /> Sign Out
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[var(--hover-bg)] transition-colors text-xs text-text-muted hover:text-text-secondary">
-        <Settings size={14} />
-        <span>Settings</span>
-      </button>
     </div>
   );
 }

@@ -7,24 +7,26 @@ import { useChatStore } from '@/store/chatStore';
 import { useChat } from '@/hooks/useChat';
 import { MODELS } from '@/config/models.config';
 import { Paperclip, X, FileText } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 const DRAFT_KEY = 'axion-draft';
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 interface FilePreview {
   name: string;
   type: string;
-  data: string; // base64
+  data: string;
   blob: Blob;
 }
 
 export function ChatInput() {
   const [input, setInput] = useState('');
   const [attachments, setAttachments] = useState<FilePreview[]>([]);
+  const [isFocused, setIsFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { isStreaming, mode } = useChatStore();
+  const { isStreaming, mode, selectedModel } = useChatStore();
   const { sendMessage, stopGeneration } = useChat();
 
   useEffect(() => {
@@ -40,7 +42,7 @@ export function ChatInput() {
     const ta = textareaRef.current;
     if (ta) {
       ta.style.height = 'auto';
-      ta.style.height = Math.min(ta.scrollHeight, 150) + 'px';
+      ta.style.height = Math.min(ta.scrollHeight, 200) + 'px';
     }
   }, []);
 
@@ -50,6 +52,14 @@ export function ChatInput() {
 
   useEffect(() => {
     textareaRef.current?.focus();
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: CustomEvent) => {
+      setInput(e.detail);
+    };
+    window.addEventListener('axion-suggest', handler as EventListener);
+    return () => window.removeEventListener('axion-suggest', handler as EventListener);
   }, []);
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -64,8 +74,7 @@ export function ChatInput() {
         try {
           const text = await att.blob.text();
           if (text.trim()) {
-            const prefix = input.trim() ? `\n\n--- Content from ${att.name} ---\n${text}\n--- End ---` : '';
-            setInput((prev) => prev + prefix);
+            setInput((prev) => prev + (prev.trim() ? `\n\n--- ${att.name} ---\n${text}\n---` : text));
           }
         } catch {
           toast.error(`Could not read ${att.name}`);
@@ -73,7 +82,7 @@ export function ChatInput() {
       }
     }
 
-    const imageParts = contentParts.filter(p => p.type === 'image_url');
+    const imageParts = contentParts.filter((p) => p.type === 'image_url');
     const msg = input.trim();
 
     setInput('');
@@ -112,7 +121,6 @@ export function ChatInput() {
       return;
     }
 
-    const selectedModel = useChatStore.getState().selectedModel;
     const model = MODELS[selectedModel];
 
     const reader = new FileReader();
@@ -125,7 +133,7 @@ export function ChatInput() {
           return;
         }
         setAttachments((prev) => [...prev, { name: file.name, type: file.type, data, blob: file }]);
-      } else if (file.type === 'text/plain' || file.type === 'application/pdf' || file.type === '' || file.name.endsWith('.txt') || file.name.endsWith('.md') || file.name.endsWith('.csv')) {
+      } else if (file.type === 'text/plain' || file.type === '' || file.name.endsWith('.txt') || file.name.endsWith('.md') || file.name.endsWith('.csv')) {
         file.text().then((text) => {
           if (input.trim()) {
             setInput((prev) => prev + `\n\n--- ${file.name} ---\n${text}\n---`);
@@ -146,66 +154,89 @@ export function ChatInput() {
   };
 
   return (
-    <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-bg-base via-bg-base/90 to-transparent pt-10 pb-6 px-4 flex justify-center z-40">
-      <form onSubmit={handleSubmit} className="w-full max-w-3xl">
-        <div className="bg-bg-base border border-border-subtle rounded-xl p-2 flex items-end gap-2 focus-within:border-accent-primary/50 transition-colors">
-          <div className="flex-1 flex flex-col">
-            {attachments.length > 0 && (
-              <div className="flex gap-2 px-2 pt-2 pb-1 overflow-x-auto">
-                {attachments.map((att, i) => (
-                  <div key={i} className="relative group flex-shrink-0">
-                    {att.type.startsWith('image/') ? (
-                      <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-border-subtle">
-                        <img src={att.data} alt={att.name} className="w-full h-full object-cover" />
-                        <button
-                          type="button"
-                          onClick={() => removeAttachment(i)}
-                          className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <X size={10} className="text-white" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-bg-elevated border border-border-subtle text-xs text-text-secondary">
-                        <FileText size={12} />
-                        <span className="truncate max-w-[80px]">{att.name}</span>
-                        <button type="button" onClick={() => removeAttachment(i)} className="ml-1 hover:text-text-primary">
-                          <X size={10} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-            <textarea
-              ref={textareaRef}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder={isStreaming ? 'Waiting for response...' : `Message Axion${mode === 'code' ? ' (Code Mode)' : mode === 'research' ? ' (Deep Research)' : ''}...`}
-              rows={1}
-              disabled={isStreaming}
-              className="w-full bg-transparent border-none outline-none resize-none px-2 py-3 text-sm text-text-primary placeholder:text-text-muted/50 focus:ring-0 disabled:opacity-50"
-              style={{ maxHeight: '150px' }}
-            />
-            <div className="flex items-center justify-between px-2 pb-1">
-              <ModelSelector />
-              <div className="flex items-center gap-1 text-text-muted">
-                <button type="button" className="p-1.5 rounded hover:bg-[var(--hover-bg)] transition-colors" title="Attach file" onClick={handleAttachClick}>
-                  <Paperclip size={20} />
-                </button>
-                <MicButton onTranscript={handleTranscript} />
+    <div className="sticky bottom-0 left-0 w-full bg-gradient-to-t from-bg-base via-bg-base/95 to-transparent pt-8 pb-6 px-4 flex justify-center z-30">
+      <form onSubmit={handleSubmit} className="w-full max-w-[760px] relative">
+        <div
+          className={cn(
+            'relative rounded-2xl border transition-all duration-200',
+            isFocused
+              ? 'border-accent-primary/40 shadow-lg shadow-accent-primary/5'
+              : 'border-border-subtle shadow-sm',
+          )}
+          style={{
+            background: 'var(--glass-bg)',
+            backdropFilter: 'blur(24px) saturate(180%)',
+            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+          }}
+        >
+          {attachments.length > 0 && (
+            <div className="flex gap-2 px-3 pt-3 pb-1 overflow-x-auto">
+              {attachments.map((att, i) => (
+                <div key={i} className="relative group flex-shrink-0">
+                  {att.type.startsWith('image/') ? (
+                    <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-border-subtle">
+                      <img src={att.data} alt={att.name} className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => removeAttachment(i)}
+                        className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X size={10} className="text-white" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-bg-elevated border border-border-subtle text-xs text-text-secondary">
+                      <FileText size={12} />
+                      <span className="truncate max-w-[80px]">{att.name}</span>
+                      <button type="button" onClick={() => removeAttachment(i)} className="ml-1 hover:text-text-primary">
+                        <X size={10} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          <textarea
+            ref={textareaRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            placeholder={isStreaming ? 'Waiting...' : `Message Axion${mode === 'code' ? ' (Code)' : mode === 'research' ? ' (Research)' : ''}...`}
+            rows={1}
+            disabled={isStreaming}
+            className="w-full bg-transparent border-none outline-none resize-none px-5 pt-4 pb-2 text-sm text-text-primary placeholder:text-text-muted/40 focus:ring-0 disabled:opacity-40 leading-relaxed"
+            style={{ maxHeight: '200px' }}
+          />
+
+          <div className="flex items-center justify-between px-3 pb-3">
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                className="p-1.5 rounded-lg hover:bg-[var(--hover-bg)] text-text-muted hover:text-text-primary transition-colors"
+                title="Attach file"
+                onClick={handleAttachClick}
+              >
+                <Paperclip size={18} />
+              </button>
+              <div className="ml-1 opacity-60 hover:opacity-100 transition-opacity">
+                <ModelSelector />
               </div>
             </div>
+            <div className="flex items-center gap-2">
+              <MicButton onTranscript={handleTranscript} />
+              <SendButton disabled={!input.trim() && attachments.length === 0 || isStreaming} isStreaming={isStreaming} onStop={stopGeneration} />
+            </div>
           </div>
-          <SendButton disabled={!input.trim() && attachments.length === 0 || isStreaming} isStreaming={isStreaming} onStop={stopGeneration} />
         </div>
-        <p className="text-[10px] text-text-muted text-center mt-2">
+        <p className="text-[10px] text-text-muted/50 text-center mt-2.5">
           Axion can make mistakes. Verify important information.
         </p>
       </form>
-      <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileChange} accept="image/*,.txt,.md,.csv,.pdf" />
+      <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileChange} accept="image/*,.txt,.md,.csv" />
     </div>
   );
 }

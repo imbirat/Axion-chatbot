@@ -34,9 +34,7 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
   }, [messages]);
 
   const stopGen = useCallback(() => {
-    if (isStreaming) {
-      stopGeneration?.();
-    }
+    if (isStreaming) stopGeneration();
   }, [isStreaming, stopGeneration]);
 
   useHotkeys({
@@ -53,11 +51,13 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen bg-bg-base text-text-primary overflow-hidden">
+      <div className="ambient-glow ambient-glow-1" />
+      <div className="ambient-glow ambient-glow-2" />
       <Sidebar />
       <main
-        className="flex-1 flex flex-col transition-all duration-220 ease-out overflow-hidden"
+        className="flex-1 flex flex-col transition-all duration-300 ease-out relative z-10"
         style={{
-          marginLeft: sidebarCollapsed ? 56 : 260,
+          marginLeft: sidebarCollapsed ? 64 : 300,
           marginRight: activeArtifact ? 420 : 0,
         }}
       >
@@ -79,7 +79,12 @@ export function AppShell({ children }: AppShellProps) {
   if (status === 'loading') {
     return (
       <div className="flex items-center justify-center h-screen bg-bg-base">
-        <div className="w-8 h-8 rounded-full border-2 border-accent-primary border-t-transparent animate-spin" />
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 rounded-xl bg-accent-primary/20 flex items-center justify-center">
+            <div className="w-5 h-5 rounded-full border-2 border-accent-primary border-t-transparent animate-spin" />
+          </div>
+          <p className="text-sm text-text-muted">Loading...</p>
+        </div>
       </div>
     );
   }

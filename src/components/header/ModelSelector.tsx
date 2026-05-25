@@ -31,11 +31,11 @@ export function ModelSelector() {
     <div className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-bg-elevated/50 border border-border-subtle text-xs font-medium text-text-secondary hover:text-text-primary hover:border-accent-primary/30 transition-all"
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-[var(--hover-bg)] text-[11px] font-medium text-text-muted hover:text-text-secondary transition-all"
       >
         {currentModel && categoryIcons[currentModel.category]}
-        <span>{currentModel?.name || 'Select Model'}</span>
-        <ChevronDown size={12} className={cn('transition-transform', isOpen && 'rotate-180')} />
+        <span>{currentModel?.name || 'Select'}</span>
+        <ChevronDown size={10} className={cn('transition-transform', isOpen && 'rotate-180')} />
       </button>
 
       <AnimatePresence>
@@ -45,14 +45,14 @@ export function ModelSelector() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 4 }}
             transition={{ duration: 0.15, ease: 'easeOut' }}
-            className="absolute bottom-full mb-2 left-0 w-72 glass-surface p-2 z-50"
+            className="absolute bottom-full mb-2 left-0 w-64 glass-surface p-1.5 z-50"
           >
             {(['main', 'basic'] as const).map((category) => {
               const models = modeModels.filter((m) => m.category === category);
               if (models.length === 0) return null;
               return (
-                <div key={category} className="mb-1">
-                  <div className="px-3 py-1.5 text-[10px] font-medium text-text-muted uppercase tracking-widest">
+                <div key={category} className="mb-0.5">
+                  <div className="px-3 py-1.5 text-[9px] font-medium text-text-muted uppercase tracking-widest">
                     {category === 'main' ? 'Main' : 'Basic'}
                   </div>
                   {models.map((model) => (
@@ -60,18 +60,18 @@ export function ModelSelector() {
                       key={model.id}
                       onClick={() => handleSelect(model)}
                       className={cn(
-                        'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all duration-150',
+                        'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left transition-all duration-150',
                         selectedModel === model.id
-                          ? 'bg-accent-primary/15 text-accent-primary'
+                          ? 'bg-accent-primary/10 text-accent-primary'
                           : 'text-text-secondary hover:bg-[var(--hover-bg)] hover:text-text-primary'
                       )}
                     >
-                      <span className={cn('w-7 h-7 rounded-lg flex items-center justify-center', selectedModel === model.id ? 'bg-accent-primary/20' : 'bg-bg-elevated')}>
+                      <span className={cn('w-7 h-7 rounded-lg flex items-center justify-center', selectedModel === model.id ? 'bg-accent-primary/15' : 'bg-bg-elevated')}>
                         {categoryIcons[model.category]}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate">{model.name}</div>
-                        <div className="text-[10px] text-text-muted truncate">{model.description}</div>
+                        <div className="text-xs font-medium truncate">{model.name}</div>
+                        <div className="text-[9px] text-text-muted truncate">{model.description}</div>
                       </div>
                     </button>
                   ))}
