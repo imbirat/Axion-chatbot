@@ -17,11 +17,12 @@ export function SidebarFooter() {
   const router = useRouter();
 
   return (
-    <div className="mt-auto pt-3 px-3 pb-3 border-t border-border-subtle">
+    <div className="mt-auto pt-3 px-3 pb-3" style={{ borderTop: '1px solid var(--sidebar-border)' }}>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--hover-bg)] transition-all duration-200 text-sm">
-            <div className="w-8 h-8 rounded-full bg-accent-primary/15 flex items-center justify-center text-xs font-semibold text-accent-primary shrink-0">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold shrink-0"
+              style={{ background: 'rgba(207,116,85,0.15)', color: 'var(--color-accent-primary)' }}>
               {session?.user?.name?.charAt(0)?.toUpperCase() || 'U'}
             </div>
             <div className="flex-1 text-left min-w-0">

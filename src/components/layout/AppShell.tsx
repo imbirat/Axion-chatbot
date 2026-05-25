@@ -53,14 +53,12 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex h-screen bg-bg-base text-text-primary overflow-hidden">
-      <div className="ambient-glow ambient-glow-1" />
-      <div className="ambient-glow ambient-glow-2" />
       <Sidebar />
       <MobileSidebar />
       <main
         className={cn(
           'flex-1 flex flex-col transition-all duration-300 ease-out relative z-10',
-          sidebarCollapsed ? 'md:ml-[64px]' : 'md:ml-[300px]',
+          sidebarCollapsed ? 'md:ml-[56px]' : 'md:ml-[260px]',
         )}
         style={{ marginRight: activeArtifact ? 420 : 0 }}
       >

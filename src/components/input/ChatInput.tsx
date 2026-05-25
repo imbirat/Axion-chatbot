@@ -163,11 +163,7 @@ export function ChatInput() {
               ? 'border-accent-primary/40 shadow-lg shadow-accent-primary/5'
               : 'border-border-subtle shadow-sm',
           )}
-          style={{
-            background: 'var(--glass-bg)',
-            backdropFilter: 'blur(24px) saturate(180%)',
-            WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-          }}
+          style={{ background: 'var(--glass-bg)' }}
         >
           {attachments.length > 0 && (
             <div className="flex gap-2 px-3 pt-3 pb-1 overflow-x-auto">
@@ -205,7 +201,7 @@ export function ChatInput() {
             onKeyDown={handleKeyDown}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
-            placeholder={isStreaming ? 'Waiting...' : `Message Axion${mode === 'code' ? ' (Code)' : mode === 'research' ? ' (Research)' : ''}...`}
+            placeholder={isStreaming ? 'Axion is thinking…' : `Message Axion${mode === 'code' ? ' (Code)' : mode === 'research' ? ' (Research)' : ''}…`}
             rows={1}
             disabled={isStreaming}
             className="w-full bg-transparent border-none outline-none resize-none px-5 pt-4 pb-2 text-sm text-text-primary placeholder:text-text-muted/40 focus:ring-0 disabled:opacity-40 leading-relaxed"

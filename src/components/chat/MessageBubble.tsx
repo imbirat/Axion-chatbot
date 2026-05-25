@@ -99,7 +99,10 @@ export function MessageBubble({ message, isStreaming, isLast, onRegenerate, onEd
                 </div>
               </div>
             ) : (
-              <div className="rounded-2xl px-4 py-2.5 bg-accent-primary/10 border border-accent-primary/15 text-sm text-text-primary leading-relaxed whitespace-pre-wrap shadow-sm">
+              <div
+                className="rounded-2xl px-4 py-3 text-[14.5px] text-text-primary leading-relaxed whitespace-pre-wrap"
+                style={{ background: 'var(--message-user-bg)' }}
+              >
                 {displayContent}
               </div>
             )}
@@ -118,7 +121,7 @@ export function MessageBubble({ message, isStreaming, isLast, onRegenerate, onEd
           </div>
         ) : (
           <>
-            <div className="text-sm text-text-primary leading-relaxed">
+            <div className="text-[15px] text-text-primary leading-[1.8]">
               <MarkdownRenderer content={displayContent} />
               {isStreaming && isLast && <StreamCursor />}
             </div>

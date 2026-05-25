@@ -72,7 +72,7 @@ export function MobileSidebar() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm md:hidden"
+            className="fixed inset-0 z-40 bg-black/40 md:hidden"
             onClick={() => setMobileSidebarOpen(false)}
           />
           <motion.aside
@@ -80,7 +80,8 @@ export function MobileSidebar() {
             animate={{ x: 0 }}
             exit={{ x: '-100%' }}
             transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed left-0 top-0 h-full w-[300px] z-50 flex flex-col bg-bg-surface border-r border-border-subtle shadow-2xl md:hidden"
+            className="fixed left-0 top-0 h-full w-[280px] z-50 flex flex-col md:hidden shadow-xl"
+            style={{ background: 'var(--sidebar-bg)', borderRight: '1px solid var(--sidebar-border)' }}
           >
             <div className="flex items-center justify-between px-4 pt-4 pb-2">
               <SidebarLogo />
@@ -95,10 +96,15 @@ export function MobileSidebar() {
             <div className="px-4 pb-3">
               <button
                 onClick={handleNewChat}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-accent-primary text-white text-sm font-medium hover:bg-accent-primary/90 active:scale-[0.98] transition-all duration-200 shadow-lg shadow-accent-primary/20"
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13px] font-medium text-text-secondary hover:text-text-primary hover:bg-[var(--hover-bg)] transition-all duration-150"
               >
-                <Plus size={16} />
-                New Chat
+                <div
+                  className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
+                  style={{ background: 'var(--color-accent-primary)' }}
+                >
+                  <Plus size={13} color="white" strokeWidth={2.5} />
+                </div>
+                New chat
               </button>
 
               <div className="mt-3 relative">
