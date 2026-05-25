@@ -15,10 +15,10 @@ export function SendButton({ disabled, isStreaming, onStop }: SendButtonProps) {
       <button
         type="button"
         onClick={onStop}
-        className="flex items-center justify-center w-9 h-9 rounded-lg bg-error/20 text-error hover:bg-error/30 transition-colors"
+        className="flex items-center justify-center w-10 h-10 rounded-lg bg-error/20 text-error hover:bg-error/30 transition-colors shrink-0"
         title="Stop generation"
       >
-        <Square size={14} fill="currentColor" />
+        <Square size={16} fill="currentColor" />
       </button>
     );
   }
@@ -30,13 +30,13 @@ export function SendButton({ disabled, isStreaming, onStop }: SendButtonProps) {
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.97 }}
       className={cn(
-        'flex items-center justify-center w-9 h-9 rounded-lg transition-all duration-200',
+        'flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 shrink-0',
         disabled
           ? 'bg-bg-elevated text-text-muted cursor-not-allowed'
-          : 'bg-accent-primary text-white hover:bg-accent-primary/90 shadow-lg shadow-accent-primary/20'
+          : 'bg-accent-primary text-white hover:bg-accent-primary/90'
       )}
     >
-      <ArrowUp size={16} />
+      <ArrowUp size={20} />
     </motion.button>
   );
 }

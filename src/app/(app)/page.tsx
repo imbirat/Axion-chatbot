@@ -14,7 +14,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative">
       <ChatHeader />
       {messages.length === 0 ? (
         <WelcomeScreen onSelectPrompt={handlePromptSelect} />

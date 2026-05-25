@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { connectDB } from '@/lib/mongodb';
-import Chat from '@/models/Chat';
 import { selectModel } from '@/lib/router';
 import { generateStream } from '@/lib/streaming';
 
@@ -12,33 +10,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { chatId, message, mode, model: preferredModel, history } = await request.json();
+    const { message, mode, model: preferredModel, history } = await request.json();
 
     if (!message) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
     const { model: selectedModel, chain } = await selectModel(message, mode || 'chat', preferredModel);
-
-    await connectDB();
-
-    let chat;
-    if (chatId) {
-      chat = await Chat.findById(chatId);
-      if (!chat) {
-        return NextResponse.json({ error: 'Chat not found' }, { status: 404 });
-      }
-    } else {
-      chat = await Chat.create({
-        userId: (session.user as any).id,
-        title: message.slice(0, 100),
-        mode: mode || 'chat',
-        aiModel: selectedModel.id,
-      });
-    }
-
-    chat.messages.push({ role: 'user', content: message });
-    await chat.save();
 
     const messagesForApi = [
       { role: 'system', content: getSystemPrompt(mode || 'chat') },
@@ -50,7 +28,6 @@ export async function POST(request: Request) {
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          let usedModel = selectedModel;
           let modelIndex = 0;
 
           while (modelIndex < chain.length) {
@@ -64,14 +41,6 @@ export async function POST(request: Request) {
                 } else if (chunk.type === 'done') {
                   controller.enqueue(encoder.encode(`data: ${JSON.stringify({ type: 'done' })}\n\n`));
                   controller.close();
-                  
-                  chat.messages.push({
-                    role: 'assistant',
-                    content: '', // full content would be tracked client-side
-                    model: currentModelId,
-                  });
-                  chat.title = chat.title === 'New Chat' ? message.slice(0, 100) : chat.title;
-                  await chat.save();
                   return;
                 } else if (chunk.type === 'error') {
                   if (chunk.error === 'RATE_LIMITED') {

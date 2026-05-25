@@ -1,20 +1,31 @@
 'use client';
-import { ModelSelector } from './ModelSelector';
 import { ModeSelector } from './ModeSelector';
-import { VoiceToggle } from './VoiceToggle';
-import { useChatStore } from '@/store/chatStore';
+import { AccountCircle, Settings } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 export function ChatHeader() {
-  const { isStreaming } = useChatStore();
+  const router = useRouter();
+  const { data: session } = useSession();
 
   return (
-    <header className="flex items-center justify-between px-6 h-14 border-b border-border-subtle bg-bg-surface/50 backdrop-blur-md">
-      <div className="flex items-center gap-4">
+    <header className="flex items-center justify-center px-6 h-14 border-b border-border-subtle bg-bg-surface/80 backdrop-blur-md shrink-0">
+      <nav className="hidden md:flex items-center gap-8">
         <ModeSelector />
-      </div>
-      <div className="flex items-center gap-3">
-        <ModelSelector />
-        {!isStreaming && <VoiceToggle />}
+      </nav>
+      <div className="absolute right-4 flex items-center gap-4">
+        <button
+          onClick={() => router.push('/settings')}
+          className="text-text-muted hover:text-accent-primary transition-colors"
+        >
+          <Settings size={20} />
+        </button>
+        <button
+          onClick={() => router.push('/settings')}
+          className="text-text-muted hover:text-accent-primary transition-colors"
+        >
+          <AccountCircle size={22} />
+        </button>
       </div>
     </header>
   );
