@@ -30,11 +30,11 @@ export const MODELS: Record<string, AxionModel> = {
     name: 'Axion 4.7',
     provider: 'groq',
     apiKeyEnv: 'GROQ_API_KEY',
-    underlying: 'kimi-k2-instruct',
+    underlying: 'deepseek-r1-distill-70b',
     category: 'main',
-    description: 'Versatile reasoning + intelligence',
+    description: 'Primary reasoning + intelligence',
     supportsStreaming: true,
-    supportsReasoning: false,
+    supportsReasoning: true,
     rateLimited: false,
   },
   'axion-4.7-coder': {
@@ -47,18 +47,6 @@ export const MODELS: Record<string, AxionModel> = {
     description: 'Advanced coding model',
     supportsStreaming: true,
     supportsReasoning: false,
-    rateLimited: false,
-  },
-  'axion-4.7-thinker': {
-    id: 'axion-4.7-thinker',
-    name: 'Axion 4.7 Thinker',
-    provider: 'groq',
-    apiKeyEnv: 'GROQ_API_KEY',
-    underlying: 'deepseek-r1-distill-70b',
-    category: 'thinking',
-    description: 'Deep reasoning + architecture',
-    supportsStreaming: true,
-    supportsReasoning: true,
     rateLimited: false,
   },
 };
@@ -74,15 +62,15 @@ export const FALLBACK_CHAINS: Record<TaskType, FallbackChain> = {
   },
   'general-premium': {
     primary: 'axion-4.7',
-    fallbacks: ['axion-4.7-coder', 'axion-4.6'],
+    fallbacks: ['axion-4.6'],
   },
   'coding': {
     primary: 'axion-4.7-coder',
     fallbacks: ['axion-4.6-coder', 'axion-4.7', 'axion-4.6'],
   },
   'reasoning': {
-    primary: 'axion-4.7-thinker',
-    fallbacks: ['axion-4.7', 'axion-4.6'],
+    primary: 'axion-4.7',
+    fallbacks: ['axion-4.6'],
   },
 };
 
@@ -93,10 +81,10 @@ export const MODE_MODEL_MAP: Record<string, { models: string[]; defaultModel: st
   },
   code: {
     models: ['axion-4.7-coder', 'axion-4.6-coder'],
-    defaultModel: 'axion-4.6-coder',
+    defaultModel: 'axion-4.7-coder',
   },
   research: {
-    models: ['axion-4.7-thinker', 'axion-4.7', 'axion-4.6'],
-    defaultModel: 'axion-4.7-thinker',
+    models: ['axion-4.7', 'axion-4.6'],
+    defaultModel: 'axion-4.7',
   },
 };
