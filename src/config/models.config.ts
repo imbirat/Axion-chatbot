@@ -42,7 +42,7 @@ export const MODELS: Record<string, AxionModel> = {
     name: 'Axion 4.7 Coder',
     provider: 'groq',
     apiKeyEnv: 'GROQ_API_KEY',
-    underlying: 'llama-3.3-70b-versatile',
+    underlying: 'qwen3-32b',
     category: 'main',
     description: 'Advanced coding model',
     supportsStreaming: true,
