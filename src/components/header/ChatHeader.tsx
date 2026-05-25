@@ -1,6 +1,6 @@
 'use client';
 import { ModeSelector } from './ModeSelector';
-import { AccountCircle, Settings } from 'lucide-react';
+import { User, Settings } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 
@@ -24,7 +24,7 @@ export function ChatHeader() {
           onClick={() => router.push('/settings')}
           className="text-text-muted hover:text-accent-primary transition-colors"
         >
-          <AccountCircle size={22} />
+          <User size={22} />
         </button>
       </div>
     </header>
