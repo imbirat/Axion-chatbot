@@ -1,0 +1,11 @@
+{
+  "functions": {
+    "api/chat/route.ts": {
+      "maxDuration": 300
+    },
+    "api/research/route.ts": {
+      "maxDuration": 300
+    }
+  },
+  "regions": ["iad1"]
+}

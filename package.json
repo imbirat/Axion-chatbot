@@ -1,0 +1,45 @@
+{
+  "name": "axion-ai",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@auth/mongodb-adapter": "^3.0.0",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@tanstack/react-query": "^5.0.0",
+    "@types/react-syntax-highlighter": "^15.5.0",
+    "bcryptjs": "^3.0.3",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0",
+    "framer-motion": "^12.0.0",
+    "lucide-react": "^0.400.0",
+    "mongodb": "^6.0.0",
+    "mongoose": "^8.0.0",
+    "next": "16.2.6",
+    "next-auth": "^5.0.0-beta.25",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-hot-toast": "^2.4.0",
+    "react-markdown": "^9.0.0",
+    "react-syntax-highlighter": "^15.6.0",
+    "remark-gfm": "^4.0.0",
+    "tailwind-merge": "^2.0.0",
+    "zustand": "^5.0.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
