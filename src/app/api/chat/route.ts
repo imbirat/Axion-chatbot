@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { selectModel } from '@/lib/router';
 import { generateStream } from '@/lib/streaming';
+import { MODELS } from '@/config/models.config';
 
 export async function POST(request: Request) {
   try {
@@ -17,6 +18,13 @@ export async function POST(request: Request) {
     }
 
     const { model: selectedModel, chain } = await selectModel(message || '', mode || 'chat', preferredModel);
+
+    const hasImages = attachments?.some((a: any) => a.type === 'image_url');
+    if (hasImages && !selectedModel.supportsVision) {
+      return NextResponse.json({
+        error: `Cannot read "${attachments.find((a: any) => a.type === 'image_url')?.image_url?.url?.slice(0, 50) || 'image'}" (this model does not support image input)`,
+      }, { status: 400 });
+    }
 
     let systemPrompt = getSystemPrompt(mode || 'chat');
     if (customInstructionsEnabled && customInstructions?.trim()) {

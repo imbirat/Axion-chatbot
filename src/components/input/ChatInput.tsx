@@ -5,6 +5,7 @@ import { SendButton } from './SendButton';
 import { ModelSelector } from '@/components/header/ModelSelector';
 import { useChatStore } from '@/store/chatStore';
 import { useChat } from '@/hooks/useChat';
+import { MODELS } from '@/config/models.config';
 import { Paperclip, X, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -111,10 +112,18 @@ export function ChatInput() {
       return;
     }
 
+    const selectedModel = useChatStore.getState().selectedModel;
+    const model = MODELS[selectedModel];
+
     const reader = new FileReader();
     reader.onload = () => {
       const data = reader.result as string;
       if (file.type.startsWith('image/')) {
+        if (!model?.supportsVision) {
+          toast.error(`Cannot read "${file.name}" (${model?.name || 'this model'} does not support image input)`);
+          e.target.value = '';
+          return;
+        }
         setAttachments((prev) => [...prev, { name: file.name, type: file.type, data, blob: file }]);
       } else if (file.type === 'text/plain' || file.type === 'application/pdf' || file.type === '' || file.name.endsWith('.txt') || file.name.endsWith('.md') || file.name.endsWith('.csv')) {
         file.text().then((text) => {

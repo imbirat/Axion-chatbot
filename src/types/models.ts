@@ -15,6 +15,7 @@ export interface AxionModel {
   maxTokens?: number;
   supportsStreaming: boolean;
   supportsReasoning: boolean;
+  supportsVision: boolean;
   rateLimited: boolean;
 }
 
