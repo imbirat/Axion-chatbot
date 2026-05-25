@@ -141,7 +141,15 @@ export async function* generateStream(
 
   const apiKey = process.env[model.apiKeyEnv];
   if (!apiKey) {
-    yield { type: 'error', error: `Missing API key for ${model.name}` };
+    const lastMsg = messages[messages.length - 1]?.content || '';
+    const mockResponse = `Hello! I'm Axion AI. You said: "${lastMsg.slice(0, 100)}". To enable AI responses, set the \`${model.apiKeyEnv}\` environment variable in Vercel with a valid API key from ${
+      model.provider === 'nvidia' ? 'NVIDIA' : 'Groq'
+    }. Until then, I'm running in offline demo mode.`;
+    for (const char of mockResponse) {
+      yield { type: 'token', content: char };
+      await new Promise((r) => setTimeout(r, 15));
+    }
+    yield { type: 'done' };
     return;
   }
 
