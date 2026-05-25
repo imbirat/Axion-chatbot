@@ -20,7 +20,7 @@ export async function POST(request: Request) {
 
     const messagesForApi = [
       { role: 'system', content: getSystemPrompt(mode || 'chat') },
-      ...(history || []).slice(-20),
+      ...(history || []).slice(-20).map((m: any) => ({ role: m.role, content: m.content })),
       { role: 'user', content: message },
     ];
 
