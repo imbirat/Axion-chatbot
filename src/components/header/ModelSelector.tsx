@@ -45,11 +45,11 @@ export function ModelSelector() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.96, y: -4 }}
+            initial={{ opacity: 0, scale: 0.96, y: 4 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.96, y: -4 }}
+            exit={{ opacity: 0, scale: 0.96, y: 4 }}
             transition={{ duration: 0.15, ease: 'easeOut' }}
-            className="absolute top-full mt-2 left-0 w-72 glass-surface p-2 z-50"
+            className="absolute bottom-full mb-2 left-0 w-72 glass-surface p-2 z-50"
           >
             {(['premium', 'thinking', 'main', 'basic'] as const).map((category) => {
               const models = modeModels.filter((m) => m.category === category);

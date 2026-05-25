@@ -6,13 +6,15 @@ import { ModelSelector } from '@/components/header/ModelSelector';
 import { useChatStore } from '@/store/chatStore';
 import { useChat } from '@/hooks/useChat';
 import { Paperclip } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const DRAFT_KEY = 'axion-draft';
 
 export function ChatInput() {
   const [input, setInput] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const { isStreaming, mode, selectedModel } = useChatStore();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { isStreaming, mode } = useChatStore();
   const { sendMessage, stopGeneration } = useChat();
 
   useEffect(() => {
@@ -60,6 +62,23 @@ export function ChatInput() {
     setInput((prev) => prev + text);
   };
 
+  const handleAttachClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type.startsWith('image/')) {
+      toast.error('This model does not support image input.');
+    } else {
+      toast.error(`File type "${file.type || 'unknown'}" is not supported yet.`);
+    }
+
+    e.target.value = '';
+  };
+
   return (
     <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-bg-base via-bg-base/90 to-transparent pt-10 pb-6 px-4 flex justify-center z-40">
       <form onSubmit={handleSubmit} className="w-full max-w-3xl">
@@ -79,7 +98,7 @@ export function ChatInput() {
             <div className="flex items-center justify-between px-2 pb-1">
               <ModelSelector />
               <div className="flex items-center gap-1 text-text-muted">
-                <button type="button" className="p-1.5 rounded hover:bg-[var(--hover-bg)] transition-colors" title="Attach file">
+                <button type="button" className="p-1.5 rounded hover:bg-[var(--hover-bg)] transition-colors" title="Attach file" onClick={handleAttachClick}>
                   <Paperclip size={20} />
                 </button>
                 <MicButton onTranscript={handleTranscript} />
@@ -92,6 +111,7 @@ export function ChatInput() {
           Axion can make mistakes. Verify important information.
         </p>
       </form>
+      <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileChange} />
     </div>
   );
 }
