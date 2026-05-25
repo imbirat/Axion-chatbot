@@ -1,17 +1,10 @@
 import NextAuth from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { MongoDBAdapter } from '@auth/mongodb-adapter';
 import { connectDB } from './mongodb';
 import mongoose from 'mongoose';
 
-const clientPromise = (async () => {
-  const conn = await connectDB();
-  return conn.connection.getClient();
-})();
-
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  adapter: MongoDBAdapter(clientPromise),
   session: { strategy: 'jwt' },
   pages: {
     signIn: '/login',
@@ -50,6 +43,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === 'google') {
+        await connectDB();
+        const UserModel = mongoose.models.User || (await import('@/models/User')).default;
+        const existing = await UserModel.findOne({ email: user.email });
+        if (!existing) {
+          await UserModel.create({
+            email: user.email,
+            name: user.name,
+            image: user.image,
+          });
+        }
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
