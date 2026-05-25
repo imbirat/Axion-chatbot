@@ -67,7 +67,7 @@ export function ModelSelector() {
                         'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all duration-150',
                         selectedModel === model.id
                           ? 'bg-accent-primary/15 text-accent-primary'
-                          : 'text-text-secondary hover:bg-white/5 hover:text-text-primary'
+                          : 'text-text-secondary hover:bg-[var(--hover-bg)] hover:text-text-primary'
                       )}
                     >
                       <span className={cn('w-7 h-7 rounded-lg flex items-center justify-center', selectedModel === model.id ? 'bg-accent-primary/20' : 'bg-bg-elevated')}>

@@ -68,15 +68,15 @@ export function MessageBubble({ message, isStreaming, isLast, onRegenerate }: Me
 
         {isAssistant && !isStreaming && message.content && (
           <div className="flex items-center gap-1 mt-1.5 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
-            <button onClick={handleCopy} className="p-1 rounded hover:bg-white/5 text-text-muted hover:text-text-primary transition-colors" title="Copy">
+            <button onClick={handleCopy} className="p-1 rounded hover:bg-[var(--hover-bg)] text-text-muted hover:text-text-primary transition-colors" title="Copy">
               {copied ? <Check size={12} className="text-success" /> : <Copy size={12} />}
             </button>
             {onRegenerate && (
-              <button onClick={onRegenerate} className="p-1 rounded hover:bg-white/5 text-text-muted hover:text-text-primary transition-colors" title="Regenerate">
+              <button onClick={onRegenerate} className="p-1 rounded hover:bg-[var(--hover-bg)] text-text-muted hover:text-text-primary transition-colors" title="Regenerate">
                 <RefreshCw size={12} />
               </button>
             )}
-            <button onClick={handleSpeak} className="p-1 rounded hover:bg-white/5 text-text-muted hover:text-text-primary transition-colors" title="Read aloud">
+            <button onClick={handleSpeak} className="p-1 rounded hover:bg-[var(--hover-bg)] text-text-muted hover:text-text-primary transition-colors" title="Read aloud">
               {speakingMessageId === message._id ? <VolumeX size={12} /> : <Volume2 size={12} />}
             </button>
           </div>

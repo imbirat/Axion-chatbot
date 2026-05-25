@@ -67,7 +67,7 @@ export default function SettingsPage() {
                 <span className="text-sm text-text-secondary">Theme</span>
                 <button
                   onClick={toggleTheme}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-bg-elevated border border-border-subtle text-sm text-text-primary hover:bg-white/5 transition-colors"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-bg-elevated border border-border-subtle text-sm text-text-primary hover:bg-[var(--hover-bg)] transition-colors"
                 >
                   {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
                   {theme === 'dark' ? 'Light' : 'Dark'}

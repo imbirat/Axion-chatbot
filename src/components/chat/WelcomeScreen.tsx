@@ -57,7 +57,7 @@ export function WelcomeScreen({ onSelectPrompt }: WelcomeScreenProps) {
             onClick={() => onSelectPrompt(`Help me ${starter.label.toLowerCase()} something`)}
             className={`flex flex-col items-start gap-2 p-4 rounded-xl border border-border-subtle bg-gradient-to-br ${starter.color} hover:glass-active transition-all duration-200 text-left group`}
           >
-            <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-accent-primary group-hover:scale-105 transition-transform">
+            <div className="w-8 h-8 rounded-lg bg-[var(--hover-bg)] flex items-center justify-center text-accent-primary group-hover:scale-105 transition-transform">
               {starter.icon}
             </div>
             <span className="text-sm font-medium text-text-primary">{starter.label}</span>

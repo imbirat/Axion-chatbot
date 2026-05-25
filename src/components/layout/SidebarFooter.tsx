@@ -21,7 +21,7 @@ export function SidebarFooter() {
     <div className="mt-auto pt-3 border-t border-border-subtle space-y-1">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 transition-colors text-sm text-text-secondary hover:text-text-primary">
+          <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[var(--hover-bg)] transition-colors text-sm text-text-secondary hover:text-text-primary">
             <div className="w-7 h-7 rounded-full bg-accent-primary/20 flex items-center justify-center text-xs font-medium text-accent-primary">
               {session?.user?.name?.charAt(0) || 'U'}
             </div>
@@ -51,7 +51,7 @@ export function SidebarFooter() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-white/5 transition-colors text-xs text-text-muted hover:text-text-secondary">
+      <button className="w-full flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-[var(--hover-bg)] transition-colors text-xs text-text-muted hover:text-text-secondary">
         <Settings size={14} />
         <span>Settings</span>
       </button>

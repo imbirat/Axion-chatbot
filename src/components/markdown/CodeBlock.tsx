@@ -43,7 +43,7 @@ export function CodeBlock({ language, value }: CodeBlockProps) {
         </span>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1 px-2 py-1 rounded text-[10px] text-text-muted hover:text-text-primary hover:bg-white/5 transition-all opacity-0 group-hover:opacity-100"
+          className="flex items-center gap-1 px-2 py-1 rounded text-[10px] text-text-muted hover:text-text-primary hover:bg-[var(--hover-bg)] transition-all opacity-0 group-hover:opacity-100"
         >
           {copied ? (
             <><Check size={12} className="text-success" /> Copied</>

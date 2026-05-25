@@ -17,7 +17,7 @@ export function ReasoningPanel({ content, isStreaming }: ReasoningPanelProps) {
     <div className="glass-surface mb-3 overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-white/[0.02] transition-colors"
+        className="flex items-center justify-between w-full px-4 py-3 text-left hover:bg-[var(--hover-bg)] transition-colors"
       >
         <div className="flex items-center gap-2">
           <Brain size={14} className="text-accent-secondary" />

@@ -32,7 +32,7 @@ export function SidebarChatItem({ chat, isActive, onClick, onRename, onDelete, o
         'group relative flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200',
         isActive
           ? 'bg-accent-primary/10 border-l-2 border-accent-primary'
-          : 'hover:bg-white/5 border-l-2 border-transparent'
+          : 'hover:bg-[var(--hover-bg)] border-l-2 border-transparent'
       )}
       onClick={onClick}
       onMouseEnter={() => setShowActions(true)}
@@ -67,13 +67,13 @@ export function SidebarChatItem({ chat, isActive, onClick, onRename, onDelete, o
             className="flex items-center gap-0.5"
             onClick={(e) => e.stopPropagation()}
           >
-            <button onClick={onPin} className="p-1 rounded hover:bg-white/10 text-text-muted hover:text-text-primary transition-colors">
+            <button onClick={onPin} className="p-1 rounded hover:bg-[var(--hover-bg)] text-text-muted hover:text-text-primary transition-colors">
               <Pin size={12} className={chat.pinned ? 'text-accent-primary fill-accent-primary' : ''} />
             </button>
-            <button onClick={() => { setIsEditing(true); setEditTitle(chat.title); }} className="p-1 rounded hover:bg-white/10 text-text-muted hover:text-text-primary transition-colors">
+            <button onClick={() => { setIsEditing(true); setEditTitle(chat.title); }} className="p-1 rounded hover:bg-[var(--hover-bg)] text-text-muted hover:text-text-primary transition-colors">
               <PencilLine size={12} />
             </button>
-            <button onClick={onDelete} className="p-1 rounded hover:bg-white/10 text-text-muted hover:text-error transition-colors">
+            <button onClick={onDelete} className="p-1 rounded hover:bg-[var(--hover-bg)] text-text-muted hover:text-error transition-colors">
               <Trash2 size={12} />
             </button>
           </motion.div>

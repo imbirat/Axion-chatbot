@@ -13,7 +13,7 @@ export function VoiceToggle() {
         'relative flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200',
         isRecording
           ? 'mic-recording'
-          : 'text-text-muted hover:text-text-primary hover:bg-white/5'
+          : 'text-text-muted hover:text-text-primary hover:bg-[var(--hover-bg)]'
       )}
       title={isRecording ? 'Stop recording' : 'Start voice input'}
     >
