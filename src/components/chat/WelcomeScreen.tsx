@@ -22,13 +22,10 @@ export function WelcomeScreen() {
           transition={{ duration: 0.3 }}
           className="text-center flex flex-col items-center"
         >
-          <p className="text-base text-text-secondary mb-1">
+          <p className="text-base text-text-secondary mb-2">
             {getGreeting()}, <span className="text-accent-primary font-medium">@{name}</span>
           </p>
-          <h1 className="text-[40px] font-bold text-accent-primary opacity-90 tracking-tighter leading-[48px]">
-            AXION
-          </h1>
-          <p className="text-lg text-text-secondary mt-2 max-w-lg text-center">
+          <p className="text-lg text-text-secondary max-w-lg text-center">
             How can I help you today?
           </p>
         </motion.div>
