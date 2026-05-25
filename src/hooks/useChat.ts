@@ -22,7 +22,7 @@ export function useChat() {
         const res = await fetch('/api/chats', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ mode, model: selectedModel, title: content.slice(0, 50) }),
+          body: JSON.stringify({ mode, aiModel: selectedModel, title: content.slice(0, 50) }),
         });
         if (res.ok) {
           const data = await res.json();

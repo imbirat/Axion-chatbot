@@ -13,7 +13,7 @@ export interface IChat extends Document {
   title: string;
   messages: IMessage[];
   mode: 'chat' | 'code' | 'research';
-  model: string;
+  aiModel: string;
   pinned: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -36,7 +36,7 @@ const ChatSchema = new Schema<IChat>(
     title: { type: String, default: 'New Chat' },
     messages: [MessageSchema],
     mode: { type: String, enum: ['chat', 'code', 'research'], default: 'chat' },
-    model: { type: String, default: 'axion-4.6' },
+    aiModel: { type: String, default: 'axion-4.6' },
     pinned: { type: Boolean, default: false },
   },
   { timestamps: true }

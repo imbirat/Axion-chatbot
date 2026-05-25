@@ -33,7 +33,7 @@ export async function POST(request: Request) {
         userId: (session.user as any).id,
         title: message.slice(0, 100),
         mode: mode || 'chat',
-        model: selectedModel.id,
+        aiModel: selectedModel.id,
       });
     }
 

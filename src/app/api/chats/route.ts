@@ -14,7 +14,7 @@ export async function GET() {
     const userId = (session.user as any).id;
     const chats = await Chat.find({ userId })
       .sort({ pinned: -1, updatedAt: -1 })
-      .select('_id title mode model pinned createdAt updatedAt')
+      .select('_id title mode aiModel pinned createdAt updatedAt')
       .lean();
 
     return NextResponse.json({ chats });
@@ -30,14 +30,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { title, mode, model } = await request.json();
+    const { title, mode, aiModel } = await request.json();
     await connectDB();
 
     const chat = await Chat.create({
       userId: (session.user as any).id,
       title: title || 'New Chat',
       mode: mode || 'chat',
-      model: model || 'axion-4.6',
+      aiModel: aiModel || 'axion-4.6',
       messages: [],
     });
 

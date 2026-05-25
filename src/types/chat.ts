@@ -17,7 +17,7 @@ export interface Chat {
   title: string;
   messages: Message[];
   mode: Mode;
-  model: string;
+  aiModel: string;
   pinned: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -26,7 +26,7 @@ export interface Chat {
 export interface CreateChatParams {
   title?: string;
   mode?: Mode;
-  model?: string;
+  aiModel?: string;
 }
 
 export interface UpdateChatParams {
