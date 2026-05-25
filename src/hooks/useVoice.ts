@@ -4,23 +4,23 @@ import { useVoiceStore } from '@/store/voiceStore';
 
 export function useVoice() {
   const { isRecording, setIsRecording, transcript, setTranscript, appendTranscript, setIsSpeaking, setSpeakingMessageId, speakingMessageId } = useVoiceStore();
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<any>(null);
   const synthRef = useRef(window.speechSynthesis);
   const silenceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const startRecording = useCallback(() => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+    const SpeechRecognitionCtor = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognitionCtor) {
       console.warn('Speech recognition not supported');
       return;
     }
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
+    const recognition = new SpeechRecognitionCtor();
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.lang = 'en-US';
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
+    recognition.onresult = (event: any) => {
       let interim = '';
       let final = '';
       for (let i = event.resultIndex; i < event.results.length; i++) {
