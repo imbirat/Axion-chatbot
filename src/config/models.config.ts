@@ -42,7 +42,7 @@ export const MODELS: Record<string, AxionModel> = {
     name: 'Axion 4.7 Coder',
     provider: 'groq',
     apiKeyEnv: 'GROQ_API_KEY',
-    underlying: 'kimi-k2-instruct',
+    underlying: 'moonshotai/kimi-k2-instruct-0905',
     category: 'main',
     description: 'Advanced coding model',
     supportsStreaming: true,
