@@ -60,7 +60,7 @@ export function Sidebar() {
       initial={false}
       animate={{ width: sidebarCollapsed ? 64 : 300 }}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed left-0 top-0 h-full z-50 flex flex-col overflow-hidden glass-surface rounded-none border-l-0 border-t-0 border-b-0"
+      className="fixed left-0 top-0 h-full z-50 hidden md:flex flex-col overflow-hidden glass-surface rounded-none border-l-0 border-t-0 border-b-0"
     >
       {!sidebarCollapsed ? (
         <>

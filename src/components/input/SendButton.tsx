@@ -15,7 +15,7 @@ export function SendButton({ disabled, isStreaming, onStop }: SendButtonProps) {
       <button
         type="button"
         onClick={onStop}
-        className="flex items-center justify-center w-10 h-10 rounded-lg bg-error/20 text-error hover:bg-error/30 transition-colors shrink-0"
+        className="flex items-center justify-center w-10 h-10 rounded-full bg-error/20 text-error hover:bg-error/30 transition-colors shrink-0"
         title="Stop generation"
       >
         <Square size={16} fill="currentColor" />
@@ -27,13 +27,13 @@ export function SendButton({ disabled, isStreaming, onStop }: SendButtonProps) {
     <motion.button
       type="submit"
       disabled={disabled}
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.97 }}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
       className={cn(
-        'flex items-center justify-center w-10 h-10 rounded-lg transition-all duration-200 shrink-0',
+        'flex items-center justify-center w-10 h-10 rounded-full shrink-0 transition-shadow duration-200',
         disabled
           ? 'bg-bg-elevated text-text-muted cursor-not-allowed'
-          : 'bg-accent-primary text-white hover:bg-accent-primary/90'
+          : 'bg-gradient-to-br from-accent-primary to-accent-secondary text-white shadow-lg shadow-accent-primary/25 hover:shadow-xl hover:shadow-accent-primary/30'
       )}
     >
       <ArrowUp size={20} />

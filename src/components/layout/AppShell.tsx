@@ -1,7 +1,9 @@
 'use client';
 import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
 import { Sidebar } from './Sidebar';
+import { MobileSidebar } from './MobileSidebar';
 import { ArtifactProvider, useArtifact } from '@/context/ArtifactContext';
 import { ArtifactPanel } from '@/components/artifacts/ArtifactPanel';
 import { ShortcutsModal } from '@/components/ui/ShortcutsModal';
@@ -54,12 +56,13 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
       <div className="ambient-glow ambient-glow-1" />
       <div className="ambient-glow ambient-glow-2" />
       <Sidebar />
+      <MobileSidebar />
       <main
-        className="flex-1 flex flex-col transition-all duration-300 ease-out relative z-10"
-        style={{
-          marginLeft: sidebarCollapsed ? 64 : 300,
-          marginRight: activeArtifact ? 420 : 0,
-        }}
+        className={cn(
+          'flex-1 flex flex-col transition-all duration-300 ease-out relative z-10',
+          sidebarCollapsed ? 'md:ml-[64px]' : 'md:ml-[300px]',
+        )}
+        style={{ marginRight: activeArtifact ? 420 : 0 }}
       >
         {children}
       </main>

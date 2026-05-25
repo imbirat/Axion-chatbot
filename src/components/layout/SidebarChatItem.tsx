@@ -38,7 +38,7 @@ export function SidebarChatItem({ chat, isActive, onClick, onRename, onDelete, o
   return (
     <div
       className={cn(
-        'group relative flex items-start gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200',
+        'group relative flex items-start gap-3 px-3 py-2.5 rounded-2xl cursor-pointer transition-all duration-200',
         isActive
           ? 'bg-accent-primary/10'
           : 'hover:bg-[var(--hover-bg)]'

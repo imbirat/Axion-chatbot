@@ -158,7 +158,7 @@ export function ChatInput() {
       <form onSubmit={handleSubmit} className="w-full max-w-[760px] relative">
         <div
           className={cn(
-            'relative rounded-2xl border transition-all duration-200',
+            'relative rounded-[28px] border transition-all duration-200',
             isFocused
               ? 'border-accent-primary/40 shadow-lg shadow-accent-primary/5'
               : 'border-border-subtle shadow-sm',

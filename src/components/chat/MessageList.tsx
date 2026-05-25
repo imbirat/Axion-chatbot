@@ -2,6 +2,7 @@
 import { MessageBubble } from './MessageBubble';
 import { SearchSources } from './SearchSources';
 import { ThinkingIndicator } from './ThinkingIndicator';
+import { WelcomeScreen } from './WelcomeScreen';
 import { ScrollToBottom } from './ScrollToBottom';
 import { useAutoScroll } from '@/hooks/useAutoScroll';
 import { useChatStore } from '@/store/chatStore';
@@ -26,6 +27,10 @@ export function MessageList() {
     }
   };
 
+  if (messages.length === 0 && !isStreaming) {
+    return <WelcomeScreen />;
+  }
+
   return (
     <div ref={containerRef} className="flex-1 overflow-y-auto px-4 md:px-6 py-6">
       <div className="max-w-3xl mx-auto">
@@ -47,18 +52,6 @@ export function MessageList() {
         {isStreaming && messages[messages.length - 1]?.content === '' && (
           <div className="flex justify-start mb-6">
             <ThinkingIndicator />
-          </div>
-        )}
-
-        {messages.length === 0 && !isStreaming && (
-          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center text-2xl font-bold text-white mb-6 shadow-lg shadow-accent-primary/20">
-              A
-            </div>
-            <h1 className="text-2xl font-semibold text-text-primary mb-2 tracking-tight">What can I help you with?</h1>
-            <p className="text-sm text-text-muted max-w-md">
-              Ask me anything — I can research, code, analyze, and more.
-            </p>
           </div>
         )}
       </div>
