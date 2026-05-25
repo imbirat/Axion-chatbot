@@ -6,7 +6,7 @@ export const MODELS: Record<string, AxionModel> = {
     name: 'Axion 4.6',
     provider: 'groq',
     apiKeyEnv: 'GROQ_API_KEY',
-    underlying: 'gemma2-9b-it',
+    underlying: 'llama-3.1-8b-instant',
     category: 'basic',
     description: 'Lightweight, fast chat',
     supportsStreaming: true,
