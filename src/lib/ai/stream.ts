@@ -1,10 +1,11 @@
 import { createGroqStream } from "./groq";
 import { createGeminiStream } from "./gemini";
+import type { ChatCompletionMessageParam } from "groq-sdk/resources/chat/completions.js";
 
 export async function createStreamResponse(
   provider: "groq" | "gemini",
   model: string,
-  messages: Record<string, unknown>[]
+  messages: ChatCompletionMessageParam[]
 ): Promise<ReadableStream> {
   const encoder = new TextEncoder();
 
