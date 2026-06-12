@@ -18,14 +18,10 @@ export function getGeminiModel(model: string = "gemini-2.5-flash") {
 
 export async function createGeminiStream(
   model: string,
-  messages: { role: string; content: string }[],
-  thinkingBudget?: number
+  messages: { role: string; content: string }[]
 ) {
   const genAI = getGeminiClient();
-  const geminiModel = genAI.getGenerativeModel({
-    model,
-    ...(thinkingBudget ? { systemInstruction: { thinkingBudget } } : {}),
-  });
+  const geminiModel = genAI.getGenerativeModel({ model });
 
   const history = messages.slice(0, -1).map((m) => ({
     role: m.role === "assistant" ? "model" : "user" as const,

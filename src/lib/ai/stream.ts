@@ -4,8 +4,7 @@ import { createGeminiStream } from "./gemini";
 export async function createStreamResponse(
   provider: "groq" | "gemini",
   model: string,
-  messages: { role: string; content: string }[],
-  options?: { thinkingBudget?: number }
+  messages: { role: string; content: string }[]
 ): Promise<ReadableStream> {
   const encoder = new TextEncoder();
 
@@ -26,7 +25,7 @@ export async function createStreamResponse(
   }
 
   if (provider === "gemini") {
-    const stream = await createGeminiStream(model, messages, options?.thinkingBudget);
+    const stream = await createGeminiStream(model, messages);
 
     return new ReadableStream({
       async start(controller) {
