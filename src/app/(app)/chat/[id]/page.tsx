@@ -23,7 +23,7 @@ export default function ChatPage() {
   const [mode] = useState<Mode>("chat");
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
-  const chat = useChat();
+  const { messages, streamingContent, aiState, isLoading, sendMessage, editMessage, copyMessage, retryMessage, feedback, loadMessages } = useChat();
 
   useEffect(() => {
     async function loadConversation() {
@@ -39,7 +39,7 @@ export default function ChatPage() {
         .order("created_at", { ascending: true });
 
       if (dbMessages) {
-        chat.loadMessages(
+        loadMessages(
           (dbMessages as DbMessage[]).map((m: DbMessage) => ({
             id: m.id,
             role: (m.role === "user" || m.role === "assistant" ? m.role : "assistant") as "user" | "assistant",
@@ -50,10 +50,10 @@ export default function ChatPage() {
       setLoading(false);
     }
     loadConversation();
-  }, [params?.id, supabase, chat]);
+  }, [params?.id, loadMessages]);
 
   function handleSend(text: string, activeMode?: string) {
-    chat.sendMessage(text, modelId, params?.id as string, activeMode || mode);
+    sendMessage(text, modelId, params?.id as string, activeMode || mode);
   }
 
   if (loading) {
@@ -67,13 +67,13 @@ export default function ChatPage() {
   return (
     <div className="flex-1 flex flex-col h-full">
       <ChatWindow
-        messages={chat.messages}
-        aiState={chat.aiState}
-        streamingContent={chat.streamingContent}
-        onEditMessage={chat.editMessage}
-        onCopyMessage={chat.copyMessage}
-        onRetryMessage={(id) => chat.retryMessage(id)}
-        onFeedback={chat.feedback}
+        messages={messages}
+        aiState={aiState}
+        streamingContent={streamingContent}
+        onEditMessage={editMessage}
+        onCopyMessage={copyMessage}
+        onRetryMessage={(id) => retryMessage(id)}
+        onFeedback={feedback}
       />
       <div className="px-4 pb-4 pt-2 border-t border-[#3A3A39]">
         <div className="max-w-3xl mx-auto">
