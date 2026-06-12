@@ -41,7 +41,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
       if (convs) setConversations(convs);
     }
     load();
-  }, [pathname]);
+  }, [pathname, supabase]);
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {

@@ -26,7 +26,8 @@ export async function createStreamResponse(
   }
 
   if (provider === "gemini") {
-    const stream = await createGeminiStream(model, messages);
+    const geminiMessages = messages.map(m => ({ role: String(m.role), content: typeof m.content === "string" ? m.content : "" }));
+    const stream = await createGeminiStream(model, geminiMessages);
 
     return new ReadableStream({
       async start(controller) {

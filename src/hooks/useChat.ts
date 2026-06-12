@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { AIState, ToolCall, Source } from "@/types";
 
 interface ChatMessage {
@@ -17,6 +17,8 @@ export function useChat() {
   const [streamingContent, setStreamingContent] = useState("");
   const [aiState, setAiState] = useState<AIState>("done");
   const [isLoading, setIsLoading] = useState(false);
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
 
   const sendMessage = useCallback(async (content: string, modelId: string, conversationId?: string, mode?: string) => {
     const userMessage: ChatMessage = {
@@ -31,11 +33,12 @@ export function useChat() {
     setStreamingContent("");
 
     try {
+      const currentMessages = messagesRef.current;
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: [...messages.map((m) => ({ role: m.role, content: m.content })), { role: "user", content }],
+          messages: [...currentMessages.map((m) => ({ role: m.role, content: m.content })), { role: "user", content }],
           modelId,
           conversationId,
           mode: mode || "chat",
@@ -76,7 +79,7 @@ export function useChat() {
     } finally {
       setIsLoading(false);
     }
-  }, [messages]);
+  }, []);
 
   const editMessage = useCallback((id: string, newContent: string) => {
     setMessages((prev) => prev.map((m) => (m.id === id ? { ...m, content: newContent } : m)));
@@ -107,6 +110,10 @@ export function useChat() {
     setAiState("done");
   }, []);
 
+  const loadMessages = useCallback((msgs: ChatMessage[]) => {
+    setMessages(msgs);
+  }, []);
+
   return {
     messages,
     streamingContent,
@@ -118,5 +125,6 @@ export function useChat() {
     retryMessage,
     feedback,
     clearMessages,
+    loadMessages,
   };
 }

@@ -41,7 +41,7 @@ export function useSettings() {
       setLoading(false);
     }
     load();
-  }, []);
+  }, [supabase]);
 
   async function update(updates: Partial<Settings>) {
     const { data: { user } } = await supabase.auth.getUser();

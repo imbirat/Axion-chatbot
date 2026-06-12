@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { SubAgentStep, AgentEvent, AgentStatus } from "@/types";
 
 export function useAgent() {
@@ -8,6 +8,9 @@ export function useAgent() {
   const [isLoading, setIsLoading] = useState(false);
 
   const [currentText, setCurrentText] = useState("");
+  const currentTextRef = useRef(currentText);
+  currentTextRef.current = currentText;
+
   const [currentWrites, setCurrentWrites] = useState<{ filename: string; language: string; content: string; status: "streaming" | "done" }[]>([]);
   const [currentEdits, setCurrentEdits] = useState<{ filename: string; additions: number; deletions: number }[]>([]);
   const [subAgents, setSubAgents] = useState<{
@@ -69,7 +72,7 @@ export function useAgent() {
       setIsLoading(false);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: currentText },
+        { role: "assistant", content: currentTextRef.current },
       ]);
     }
   }, []);

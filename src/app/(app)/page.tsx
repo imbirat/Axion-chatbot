@@ -36,7 +36,7 @@ export default function HomePage() {
       }
     }
     load();
-  }, []);
+  }, [supabase]);
 
   const greeting = useMemo(() => {
     const hour = new Date().getHours();

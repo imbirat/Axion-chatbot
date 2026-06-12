@@ -17,7 +17,7 @@ export function useConversations() {
       .limit(20);
     if (data) setConversations(data);
     setLoading(false);
-  }, []);
+  }, [supabase]);
 
   useEffect(() => {
     load();

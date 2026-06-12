@@ -8,6 +8,14 @@ import { ChatWindow } from "@/components/chat/ChatWindow";
 import { ChatInput } from "@/components/input/ChatInput";
 import { Mode } from "@/types";
 
+interface DbMessage {
+  id: string;
+  role: string;
+  content: string;
+  tool_calls: unknown;
+  sources: unknown;
+}
+
 export default function ChatPage() {
   const params = useParams();
   const [modelId, setModelId] = useState("axion-4.7");
@@ -24,21 +32,25 @@ export default function ChatPage() {
         return;
       }
 
-      const { data: messages } = await supabase
+      const { data: dbMessages } = await supabase
         .from("messages")
         .select("*")
         .eq("conversation_id", params.id)
         .order("created_at", { ascending: true });
 
-      if (messages) {
-        for (const msg of messages) {
-          chat.sendMessage(msg.content, modelId, params.id as string);
-        }
+      if (dbMessages) {
+        chat.loadMessages(
+          (dbMessages as DbMessage[]).map((m: DbMessage) => ({
+            id: m.id,
+            role: (m.role === "user" || m.role === "assistant" ? m.role : "assistant") as "user" | "assistant",
+            content: m.content || "",
+          }))
+        );
       }
       setLoading(false);
     }
     loadConversation();
-  }, [params?.id]);
+  }, [params?.id, supabase, chat]);
 
   function handleSend(text: string, activeMode?: string) {
     chat.sendMessage(text, modelId, params?.id as string, activeMode || mode);
