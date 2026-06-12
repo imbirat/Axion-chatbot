@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Brain, Globe, PenLine } from "lucide-react";
 import { AIState } from "@/types";
 
@@ -10,7 +11,15 @@ interface ThinkingIndicatorProps {
 export function ThinkingIndicator({ state }: ThinkingIndicatorProps) {
   if (state === "done") return null;
 
-  const config = {
+  type ConfigEntry = {
+    icon: React.ElementType;
+    label: string;
+    subtext: string;
+    className: string;
+    spin?: boolean;
+  };
+
+  const config: Record<string, ConfigEntry> = {
     thinking: {
       icon: Brain,
       label: "Thinking...",
