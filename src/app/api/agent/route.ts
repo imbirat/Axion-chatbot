@@ -42,8 +42,13 @@ code here
 </content>
 </write_file>`;
 
-function parseAgentOutput(text: string): Record<string, unknown>[] {
-  const events: Record<string, unknown>[] = [];
+type ParsedEvent =
+  | { type: "write"; filename: string; content: string }
+  | { type: "edit"; filename: string; additions: number; deletions: number }
+  | { type: "delegate"; task: string };
+
+function parseAgentOutput(text: string): ParsedEvent[] {
+  const events: ParsedEvent[] = [];
 
   const writeRegex = /<write_file>[\s\S]*?<filename>([\s\S]*?)<\/filename>[\s\S]*?<content>([\s\S]*?)<\/content>[\s\S]*?<\/write_file>/g;
   let match;
