@@ -179,7 +179,7 @@ export function useAgent() {
           const updated = {
             ...prev,
             status: "done" as AgentStatus,
-            thread: [...prev.thread, { type: "summary", content: event.summary || "Done" }],
+            thread: [...prev.thread, { type: "summary" as const, content: event.summary || "Done" }],
           };
           setSubAgents((agents) => [...agents, updated]);
           return null;
