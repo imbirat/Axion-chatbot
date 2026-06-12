@@ -14,8 +14,11 @@ declare global {
   }
 }
 
+type SR_Result = { transcript: string };
+type SR_Alt = SR_Result & { isFinal?: boolean };
+
 type SR_Event = {
-  results: { [index: number]: { [index: number]: { transcript: string } } & { isFinal?: boolean } };
+  results: ArrayLike<ArrayLike<SR_Alt>>;
 };
 
 type SR_Constructor = new () => {

@@ -15,8 +15,11 @@ declare global {
   }
 }
 
+type SpeechRecognitionResult = { transcript: string };
+type SpeechRecognitionAlternative = SpeechRecognitionResult & { isFinal?: boolean };
+
 type SpeechRecognitionEvent = {
-  results: { [index: number]: { [index: number]: { transcript: string } } & { isFinal?: boolean } };
+  results: ArrayLike<ArrayLike<SpeechRecognitionAlternative>>;
 };
 
 type SpeechRecognitionConstructor = new () => {
