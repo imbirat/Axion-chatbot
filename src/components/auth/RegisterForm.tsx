@@ -17,9 +17,19 @@ export function RegisterForm() {
   const router = useRouter();
   const supabase = createClient();
 
+  const isConfigured = typeof window !== "undefined" && !!(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      setError("Supabase is not configured. Please add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to your environment variables.");
+      return;
+    }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
@@ -33,34 +43,62 @@ export function RegisterForm() {
 
     setLoading(true);
 
-    const { error: signUpError, data } = await supabase.auth.signUp({
-      email,
-      password,
+    try {
+      const { error: signUpError, data } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { username: email.split("@")[0] },
+        },
+      });
+
+      if (signUpError) {
+        setError(signUpError.message);
+        setLoading(false);
+        return;
+      }
+
+      if (data.user) {
+        try {
+          await supabase.from("profiles").insert({
+            id: data.user.id,
+            email,
+            username: email.split("@")[0],
+          });
+        } catch {
+          // profiles table may not exist yet — that's ok, user is still created
+        }
+      }
+
+      router.push("/");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
+      setLoading(false);
+    }
+  }
+
+  async function handleGoogleSignIn() {
+    setError("");
+    const { error: authError } = await supabase.auth.signInWithOAuth({
+      provider: "google",
       options: {
-        data: { username: email.split("@")[0] },
+        redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
 
-    if (signUpError) {
-      setError(signUpError.message);
-      setLoading(false);
-      return;
+    if (authError) {
+      setError(authError.message);
     }
-
-    if (data.user) {
-      await supabase.from("profiles").insert({
-        id: data.user.id,
-        email,
-        username: email.split("@")[0],
-      });
-    }
-
-    router.push("/");
-    router.refresh();
   }
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      {!isConfigured && (
+        <div className="p-3 rounded-lg bg-danger/10 border border-danger/30 text-xs text-danger">
+          Supabase environment variables are missing. Set <code className="font-mono">NEXT_PUBLIC_SUPABASE_URL</code> and <code className="font-mono">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> to enable authentication.
+        </div>
+      )}
       <Input
         label="Email"
         type="email"
@@ -88,9 +126,33 @@ export function RegisterForm() {
       {error && (
         <p className="text-xs text-danger">{error}</p>
       )}
-      <Button type="submit" size="lg" className="w-full mt-2" disabled={loading}>
+      <Button type="submit" size="lg" className="w-full" disabled={loading || !isConfigured}>
         <UserPlus size={16} />
         {loading ? "Creating account..." : "Create Account"}
+      </Button>
+      <div className="relative my-2">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-[#3A3A39]" />
+        </div>
+        <div className="relative flex justify-center text-xs">
+          <span className="bg-[#2A2A29] px-2 text-[#9B9B99]">or continue with</span>
+        </div>
+      </div>
+      <Button
+        type="button"
+        variant="secondary"
+        size="lg"
+        className="w-full"
+        onClick={handleGoogleSignIn}
+        disabled={!isConfigured}
+      >
+        <svg viewBox="0 0 24 24" width="16" height="16" className="mr-2">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>
+        Sign up with Google
       </Button>
       <p className="text-sm text-text-secondary text-center mt-2">
         Already have an account?{" "}
