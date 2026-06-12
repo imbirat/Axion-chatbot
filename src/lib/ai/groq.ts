@@ -1,4 +1,5 @@
 import Groq from "groq-sdk";
+import type { ChatCompletionMessageParam } from "groq-sdk/resources/chat/completions.js";
 
 let groqInstance: Groq | null = null;
 
@@ -11,7 +12,7 @@ export function getGroqClient(): Groq {
 
 export async function createGroqStream(
   model: string,
-  messages: { role: string; content: string }[],
+  messages: ChatCompletionMessageParam[],
   maxTokens: number = 8192
 ) {
   const groq = getGroqClient();

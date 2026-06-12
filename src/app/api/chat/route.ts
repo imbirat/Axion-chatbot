@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     if (model.provider === "groq") {
       const stream = await groq.chat.completions.create({
         model: model.modelString,
-        messages: fullMessages,
+        messages: fullMessages as any,
         stream: true,
         max_tokens: 8192,
       });
