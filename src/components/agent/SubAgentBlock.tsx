@@ -15,11 +15,11 @@ interface SubAgentBlockProps {
   thread: SubAgentStep[];
 }
 
-export function SubAgentBlock({ model, task, status, thread }: SubAgentBlockProps) {
+export function SubAgentBlock({ model: _model, task, status, thread }: SubAgentBlockProps) {
   const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
-    if (status === "done" && !expanded) {
+    if (status === "done") {
       setExpanded(true);
     }
   }, [status]);

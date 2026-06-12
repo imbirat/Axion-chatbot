@@ -1,37 +1,56 @@
 "use client";
 
 import { useState } from "react";
-import { Mic, MicOff, PhoneOff } from "lucide-react";
+import { Mic, MicOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface VoiceButtonProps {
   onTranscript: (text: string) => void;
 }
 
+declare global {
+  interface Window {
+    _recognition?: { stop: () => void };
+  }
+}
+
+type SR_Event = {
+  results: { [index: number]: { [index: number]: { transcript: string } } & { isFinal?: boolean } };
+};
+
+type SR_Constructor = new () => {
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: (event: SR_Event) => void;
+  start: () => void;
+  stop: () => void;
+};
+
 export function VoiceButton({ onTranscript }: VoiceButtonProps) {
   const [listening, setListening] = useState(false);
 
   function toggleListening() {
     if (!listening) {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
+      const SR = (window as { SpeechRecognition?: SR_Constructor; webkitSpeechRecognition?: SR_Constructor }).SpeechRecognition
+        || (window as { SpeechRecognition?: SR_Constructor; webkitSpeechRecognition?: SR_Constructor }).webkitSpeechRecognition;
+      if (SR) {
+        const recognition = new SR();
         recognition.continuous = true;
         recognition.interimResults = true;
-        recognition.onresult = (event: any) => {
+        recognition.onresult = (event: SR_Event) => {
           const transcript = Array.from(event.results)
-            .map((r: any) => r[0].transcript)
+            .map((r) => r[0].transcript)
             .join("");
           onTranscript(transcript);
         };
-        (window as any)._recognition = recognition;
+        window._recognition = recognition;
         recognition.start();
         setListening(true);
       }
     } else {
-      if ((window as any)._recognition) {
-        (window as any)._recognition.stop();
-        (window as any)._recognition = null;
+      if (window._recognition) {
+        window._recognition.stop();
+        window._recognition = undefined;
       }
       setListening(false);
     }

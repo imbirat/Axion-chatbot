@@ -2,7 +2,6 @@
 
 import { Download, Copy } from "lucide-react";
 import { Tooltip } from "@/components/ui/Tooltip";
-import { cn } from "@/lib/utils";
 
 interface MarkdownBlockProps {
   content: string;

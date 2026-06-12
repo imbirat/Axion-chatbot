@@ -55,7 +55,7 @@ export function getModelForMode(mode: string, currentModelId?: string): ModelCon
   if (mode === "code") return CODER_MODELS[0] || MODELS[2];
   if (currentModelId) {
     const model = getModelById(currentModelId);
-    if (model && model.modes.includes(mode as any)) return model;
+    if (model && model.modes.includes(mode as "chat" | "code" | "voice" | "agent")) return model;
   }
   return MODELS[0];
 }

@@ -9,31 +9,51 @@ interface DictateButtonProps {
   className?: string;
 }
 
+declare global {
+  interface Window {
+    _dictation?: { stop: () => void };
+  }
+}
+
+type SpeechRecognitionEvent = {
+  results: { [index: number]: { [index: number]: { transcript: string } } & { isFinal?: boolean } };
+};
+
+type SpeechRecognitionConstructor = new () => {
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onend: () => void;
+  start: () => void;
+  stop: () => void;
+};
+
 export function DictateButton({ onTranscript, className }: DictateButtonProps) {
   const [listening, setListening] = useState(false);
 
   function toggle() {
     if (!listening) {
-      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-      if (!SpeechRecognition) return;
+      const SR = (window as { SpeechRecognition?: SpeechRecognitionConstructor; webkitSpeechRecognition?: SpeechRecognitionConstructor }).SpeechRecognition
+        || (window as { SpeechRecognition?: SpeechRecognitionConstructor; webkitSpeechRecognition?: SpeechRecognitionConstructor }).webkitSpeechRecognition;
+      if (!SR) return;
 
-      const recognition = new SpeechRecognition();
+      const recognition = new SR();
       recognition.continuous = true;
       recognition.interimResults = true;
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
         const transcript = Array.from(event.results)
-          .map((r: any) => r[0].transcript)
+          .map((r) => r[0].transcript)
           .join("");
         onTranscript(transcript);
       };
       recognition.onend = () => setListening(false);
-      (window as any)._dictation = recognition;
+      window._dictation = recognition;
       recognition.start();
       setListening(true);
     } else {
-      if ((window as any)._dictation) {
-        (window as any)._dictation.stop();
-        (window as any)._dictation = null;
+      if (window._dictation) {
+        window._dictation.stop();
+        window._dictation = undefined;
       }
       setListening(false);
     }

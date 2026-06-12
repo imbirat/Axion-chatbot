@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       });
 
       const data = await response.json();
-      const sources = (data.organic || []).map((r: any) => ({
+      const sources = (data.organic || []).map((r: { title: string; link: string; snippet: string }) => ({
         title: r.title,
         url: r.link,
         snippet: r.snippet,

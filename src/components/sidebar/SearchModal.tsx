@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Search, MessageSquare, Bot, Code2 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Conversation } from "@/types";
 
 interface SearchModalProps {

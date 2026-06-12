@@ -58,8 +58,8 @@ export async function POST(req: NextRequest) {
     if (model.provider === "gemini") {
       const geminiModel = genAI.getGenerativeModel({ model: model.modelString });
       const chat = geminiModel.startChat({
-        history: fullMessages.slice(0, -1).map((m: any) => ({
-          role: m.role === "assistant" ? "model" : "user",
+        history: fullMessages.slice(0, -1).map((m: { role: string; content: string }) => ({
+          role: m.role === "assistant" ? "model" as const : "user" as const,
           parts: [{ text: m.content }],
         })),
       });

@@ -42,8 +42,8 @@ code here
 </content>
 </write_file>`;
 
-function parseAgentOutput(text: string): any[] {
-  const events: any[] = [];
+function parseAgentOutput(text: string): Record<string, unknown>[] {
+  const events: Record<string, unknown>[] = [];
 
   const writeRegex = /<write_file>[\s\S]*?<filename>([\s\S]*?)<\/filename>[\s\S]*?<content>([\s\S]*?)<\/content>[\s\S]*?<\/write_file>/g;
   let match;
@@ -74,7 +74,7 @@ function parseAgentOutput(text: string): any[] {
 
 export async function POST(req: NextRequest) {
   try {
-    const { message, conversationId } = await req.json();
+    const { message } = await req.json();
 
     const geminiModel = genAI.getGenerativeModel({
       model: "gemini-2.5-flash",

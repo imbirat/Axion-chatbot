@@ -1,6 +1,7 @@
 "use client";
 
-import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+// Note: Panel/PanelGroup would be used for resizable split layout
+// If needed in future, uncomment: import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { CodeToolbar } from "./CodeToolbar";
 import { CodeEditor } from "./CodeEditor";
 import { CodePreview } from "./CodePreview";

@@ -17,10 +17,10 @@ export async function searchWeb(query: string): Promise<Source[]> {
     });
 
     const data = await response.json();
-    return (data.results || []).map((r: any) => ({
+    return (data.results || []).map((r: { title: string; url: string; content?: string; snippet?: string }) => ({
       title: r.title,
       url: r.url,
-      snippet: r.content || r.snippet,
+      snippet: r.content || r.snippet || "",
     }));
   }
 
@@ -35,7 +35,7 @@ export async function searchWeb(query: string): Promise<Source[]> {
     });
 
     const data = await response.json();
-    return (data.organic || []).map((r: any) => ({
+    return (data.organic || []).map((r: { title: string; link: string; snippet: string }) => ({
       title: r.title,
       url: r.link,
       snippet: r.snippet,

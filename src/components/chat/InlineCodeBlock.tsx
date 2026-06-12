@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Download, Copy } from "lucide-react";
 import { Tooltip } from "@/components/ui/Tooltip";
-import { mapLanguageToMonaco } from "@/lib/models";
 
 interface InlineCodeBlockProps {
   code: string;
@@ -13,7 +12,6 @@ interface InlineCodeBlockProps {
 
 export function InlineCodeBlock({ code, language, onOpen }: InlineCodeBlockProps) {
   const [copied, setCopied] = useState(false);
-  const monacoLang = mapLanguageToMonaco(language);
 
   function handleCopy() {
     navigator.clipboard.writeText(code);

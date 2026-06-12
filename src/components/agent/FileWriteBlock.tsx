@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { FilePlus, ChevronDown, ChevronUp } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { mapLanguageToMonaco } from "@/lib/models";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";

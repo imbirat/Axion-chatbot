@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Wrench, CheckCircle, Loader2 } from "lucide-react";
+import { Wrench, CheckCircle } from "lucide-react";
 import { ToolCall } from "@/types";
-import { cn } from "@/lib/utils";
 
 interface ToolCallBlockProps {
   toolCall: ToolCall;

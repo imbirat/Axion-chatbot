@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { ModelSelector } from "./ModelSelector";
 import { ModePill } from "./ModePill";
 import { VoiceButton } from "./VoiceButton";
-import { Mode, Mode as ModeType } from "@/types";
+import { Mode } from "@/types";
 
 interface ChatInputProps {
   onSend: (message: string, mode?: string) => void;
@@ -57,11 +57,6 @@ export function ChatInput({
   function handleTranscript(transcript: string) {
     setText((prev) => prev + transcript);
   }
-
-  const modeConfigs = [
-    { id: "deepresearch", icon: Plus, label: "Deep Research" },
-    { id: "learn", icon: Plus, label: "Learn" },
-  ];
 
   return (
     <div className="flex flex-col gap-2">

@@ -5,14 +5,12 @@ import { useRouter } from "next/navigation";
 import { Moon, Sun, Monitor, Trash2, LogOut, AlertTriangle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useSettings } from "@/hooks/useSettings";
-import { useConversations } from "@/hooks/useConversations";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { cn } from "@/lib/utils";
 
 export function SettingsPanel() {
   const { settings, update } = useSettings();
-  const { remove } = useConversations();
   const [clearOpen, setClearOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
@@ -70,7 +68,7 @@ export function SettingsPanel() {
                 return (
                   <button
                     key={opt.value}
-                    onClick={() => update({ appearance: opt.value as any })}
+                    onClick={() => update({ appearance: opt.value as "system" | "dark" | "light" })}
                     className={cn(
                       "flex items-center gap-2 px-4 py-2 rounded-lg text-sm border transition-colors",
                       settings.appearance === opt.value
@@ -91,7 +89,7 @@ export function SettingsPanel() {
               {["system", "medium", "increased"].map((c) => (
                 <button
                   key={c}
-                  onClick={() => update({ contrast: c as any })}
+                  onClick={() => update({ contrast: c as "system" | "medium" | "increased" })}
                   className={cn(
                     "px-4 py-2 rounded-lg text-sm border capitalize transition-colors",
                     settings.contrast === c

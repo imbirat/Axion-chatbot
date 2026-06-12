@@ -10,13 +10,6 @@ interface ConversationListProps {
   conversations: Conversation[];
 }
 
-const modeIcons = {
-  chat: MessageSquare,
-  code: Code2,
-  agent: Bot,
-  voice: MessageSquare,
-};
-
 export function ConversationList({ collapsed, conversations }: ConversationListProps) {
   const router = useRouter();
   const params = useParams();
@@ -29,7 +22,6 @@ export function ConversationList({ collapsed, conversations }: ConversationListP
         </p>
       )}
       {conversations.map((conv) => {
-        const Icon = conv.mode === "agent" ? Bot : conv.mode === "code" ? Code2 : MessageSquare;
         const isActive = params?.id === conv.id;
 
         return (

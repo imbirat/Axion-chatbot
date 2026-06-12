@@ -56,7 +56,6 @@ export function AIMessage({
   aiState,
   toolCalls,
   sources,
-  thinking,
   onCopy,
   onRetry,
   onFeedback,

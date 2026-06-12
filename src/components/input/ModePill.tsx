@@ -1,7 +1,6 @@
 "use client";
 
 import { X, FlaskConical, BookOpen } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface ModePillProps {
   mode: string;
