@@ -1,5 +1,6 @@
 import { NextRequest } from "next/server";
 import Groq from "groq-sdk";
+import type { ChatCompletionMessageParam } from "groq-sdk/resources/chat/completions.js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { MODELS } from "@/lib/models";
 
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
     if (model.provider === "groq") {
       const stream = await groq.chat.completions.create({
         model: model.modelString,
-        messages: fullMessages as any,
+        messages: fullMessages as ChatCompletionMessageParam[],
         stream: true,
         max_tokens: 8192,
       });
