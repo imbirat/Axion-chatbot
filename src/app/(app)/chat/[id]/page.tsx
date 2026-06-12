@@ -23,7 +23,7 @@ export default function ChatPage() {
   const [mode] = useState<Mode>("chat");
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
-  const { messages, streamingContent, aiState, isLoading, sendMessage, editMessage, copyMessage, retryMessage, feedback, loadMessages } = useChat();
+  const { messages, streamingContent, aiState, sendMessage, editMessage, copyMessage, retryMessage, feedback, loadMessages } = useChat();
 
   useEffect(() => {
     async function loadConversation() {
